@@ -315,7 +315,6 @@ def eco_friendly_manufacturing_comparison(df):
     
     print("Eco-friendly manufacturing comparison plots saved")
 
-# def product_line_diversity_impact(df):
 
 def certifications_analysis(df):
     # Assuming Certifications column contains comma-separated values
@@ -512,8 +511,6 @@ def certifications_analysis(df):
         print("Certifications analysis plots saved")
     else:
         print("No 'Certifications' column found in the dataset")
-
-# def market_trend_analysis(df):
 
 if __name__ == "__main__":
     main()
