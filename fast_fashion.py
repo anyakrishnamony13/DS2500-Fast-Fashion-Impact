@@ -32,7 +32,7 @@ def plot_by_rating(df):
     plt.ylabel("Average Value")
     plt.xticks(rotation=0)
     plt.tight_layout()
-    plt.show()
+    plt.show(block=True)
 
 def boxplot_by_material(df):
     df.boxplot(column="Carbon_Footprint_MT", by="Material_Type", rot=90, figsize=(12, 6))
@@ -40,40 +40,25 @@ def boxplot_by_material(df):
     plt.suptitle("")
     plt.ylabel("Metric Tons")
     plt.tight_layout()
-    plt.show()
-
-    df.boxplot(column="Water_Usage_Liters", by="Material_Type", rot=90, figsize=(12, 6))
-    plt.title("Water Usage by Material Type")
-    plt.suptitle("")
-    plt.ylabel("Liters")
-    plt.tight_layout()
-    plt.show()
-
-    df.boxplot(column="Waste_Production_KG", by="Material_Type", rot=90, figsize=(12, 6))
-    plt.title("Waste Production by Material Type")
-    plt.suptitle("")
-    plt.ylabel("Kilograms")
-    plt.tight_layout()
-    plt.show()
+    plt.show(block=True)
 
 def pie_chart_materials(df):
-    df["Material_Type"].value_counts().plot.pie(
-        figsize=(8, 8), autopct='%1.1f%%', startangle=90, colormap='Set3'
-    )
-    plt.title("Distribution of Material Types")
+    counts = df["Material_Type"].value_counts()
+    counts.plot.pie(autopct='%1.1f%%', figsize=(8, 8))
+    plt.title("Most Common Materials Used")
     plt.ylabel("")
     plt.tight_layout()
-    plt.show()
+    plt.show(block=True)
 
 def scatter_plot(df):
-    plt.figure(figsize=(8, 6))
-    plt.scatter(df["Water_Usage_Liters"], df["Waste_Production_KG"], alpha=0.6, color='purple')
-    plt.title("Water Usage vs Waste Production")
+    df.plot(kind='scatter', x='Water_Usage_Liters', y='Carbon_Footprint_MT',
+            alpha=0.5, color='teal', figsize=(10, 6))
+    plt.title("Water Usage vs. Carbon Footprint")
     plt.xlabel("Water Usage (Liters)")
-    plt.ylabel("Waste Production (KG)")
-    plt.grid(True, linestyle='--', alpha=0.4)
+    plt.ylabel("Carbon Footprint (Metric Tons)")
+    plt.grid(True)
     plt.tight_layout()
-    plt.show()
+    plt.show(block=True)
 
 def linear_regression(df):
     X = df[["Water_Usage_Liters"]]
@@ -93,18 +78,21 @@ def kmeans_clustering(df):
 
 def main():
     cleaned_df = clean_data(fashion_df)
-    print("--- CLEANED DATA PREVIEW ---")
-    print(cleaned_df.head())
 
     plot_by_rating(cleaned_df)
+    input("Press Enter to see boxplot...")
     boxplot_by_material(cleaned_df)
+    input("Press Enter to see pie chart...")
     pie_chart_materials(cleaned_df)
+    input("Press Enter to see scatter plot...")
     scatter_plot(cleaned_df)
+
     linear_regression(cleaned_df)
     kmeans_clustering(cleaned_df)
 
 if __name__ == "__main__":
     main()
+
 
 
 
