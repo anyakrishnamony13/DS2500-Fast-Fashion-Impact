@@ -9,13 +9,14 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
+# Load the dataset
 FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
 fashion_df = pd.read_csv(FILENAME)
 
 def clean_data(df):
     df.columns = df.columns.str.strip()
     numeric_cols = [
-        "Carbon_Footprint_MT", "Water_Usage_Liters", 
+        "Carbon_Footprint_MT", "Water_Usage_Liters",
         "Waste_Production_KG", "Average_Price_USD"
     ]
     for col in numeric_cols:
@@ -70,4 +71,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
