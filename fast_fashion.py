@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
-FILENAME = 'your_dataset.csv'
+FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
 fashion_df = pd.read_csv(FILENAME)
 
 def clean_data(df):
