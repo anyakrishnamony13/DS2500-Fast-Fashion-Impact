@@ -515,7 +515,6 @@ def certifications_analysis(df):
 
 # def market_trend_analysis(df):
 
-if __name__ == "__main__":
-    main()
+
 
 
