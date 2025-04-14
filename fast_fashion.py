@@ -514,7 +514,7 @@ def certifications_analysis(df):
         print("No 'Certifications' column found in the dataset")
 
 def main():
-    df = pd.read_csv("fast_fashion_dataset.csv")
+    df = pd.read_csv("Sustainable Fashion Export 2025-04-06 19-58-02.csv")
     df.columns = df.columns.str.strip()
 
     rating_map = {"A": 4, "B": 3, "C": 2, "D": 1}
