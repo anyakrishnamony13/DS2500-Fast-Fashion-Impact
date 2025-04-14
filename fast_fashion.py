@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")  # Suppress warnings
 FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
 
 def load_and_clean_data():
-    """Load and clean the fashion export dataset"""
+
     fashion_df = pd.read_csv(FILENAME)
     fashion_df.columns = fashion_df.columns.str.strip()
     
@@ -33,19 +33,18 @@ def load_and_clean_data():
     
     fashion_df = fashion_df.dropna(subset=["Sustainability_Rating"] + numeric_cols)
     
-    print(f"Data loaded with {len(fashion_df)} rows")
+
     
     return fashion_df
 
 def country_sustainability_analysis(df):
-    """Analyze sustainability performance by country"""
-    # Metrics to analyze
+   
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     
-    # Aggregate metrics by country
+
     country_metrics = df.groupby('Country')[metrics].mean().reset_index()
     
-    # Get top 10 countries by number of brands
+
     top_countries = df['Country'].value_counts().head(10).index.tolist()
     country_metrics = country_metrics[country_metrics['Country'].isin(top_countries)]
     
