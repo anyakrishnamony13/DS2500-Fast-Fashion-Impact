@@ -29,9 +29,10 @@ def load_and_clean_data():
         fashion_df[col] = pd.to_numeric(fashion_df[col], errors='coerce')
     
     fashion_df['Year'] = pd.to_numeric(fashion_df['Year'], errors='coerce')
+    
     fashion_df = fashion_df.dropna(subset=["Sustainability_Rating"] + numeric_cols)
     
-    print(f"Data loaded with {len(fashion_df)} rows")
+    
     return fashion_df
 
 def material_price_segment_analysis(df):
@@ -47,7 +48,7 @@ def material_price_segment_analysis(df):
     
     # Sort materials by number of brands using them (to get the most common materials)
     material_counts = df['Material_Type'].value_counts()
-    top_materials = material_counts.head(6).index.tolist()  # Top 6 materials
+    top_materials = material_counts.head(6).index.tolist() 
     
     # Filter to top materials
     df_filtered = df[df['Material_Type'].isin(top_materials)]
@@ -151,7 +152,7 @@ def country_material_analysis(df):
         plt.savefig(f'country_material_{metric}.png', dpi=300, bbox_inches='tight')
         plt.close()
     
-    print("Country and material analysis visualizations saved")
+ 
 
 def rating_eco_manufacturing_analysis(df):
     """Analyze environmental impact by sustainability rating and eco-friendly manufacturing"""
@@ -213,17 +214,18 @@ def rating_eco_manufacturing_analysis(df):
         plt.xlabel('Sustainability Rating', fontsize=14)
         plt.ylabel(title, fontsize=14)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
+        
         plt.legend(title='Manufacturing Type', title_fontsize=12)
         
         plt.tight_layout()
         plt.savefig(f'rating_eco_{metric}.png', dpi=300, bbox_inches='tight')
         plt.close()
     
-    print("Rating and eco-friendly manufacturing analysis visualizations saved")
+
 
 def year_rating_trend_analysis(df):
     """Analyze trends in environmental impact over time by sustainability rating"""
-    # Check if we have multiple years
+
     if df['Year'].nunique() <= 1:
         print("Not enough years in the dataset for trend analysis")
         return
@@ -300,11 +302,10 @@ def year_rating_trend_analysis(df):
         plt.tight_layout()
         plt.savefig(f'year_rating_{metric}.png', dpi=300, bbox_inches='tight')
         plt.close()
-    
-    print("Year and rating trend analysis visualizations saved")
+
 
 def main():
-    print("Starting segmented sustainable fashion data analysis...")
+
     
     # Load and clean the data
     df = load_and_clean_data()
@@ -315,7 +316,6 @@ def main():
     rating_eco_manufacturing_analysis(df)
     year_rating_trend_analysis(df)
     
-    print("All segmented visualizations complete!")
 
 if __name__ == "__main__":
     main()
