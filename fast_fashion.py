@@ -20,11 +20,14 @@ def clean_and_prepare(df):
     df["Sustainability_Score"] = df["Sustainability_Rating"].map({"A": 4, "B": 3, "C": 2, "D": 1})
     df["Eco_Friendly_Manufacturing"] = df["Eco_Friendly_Manufacturing"].map({"Yes": 1, "No": 0})
     df["Recycling_Programs"] = df["Recycling_Programs"].map({"Yes": 1, "No": 0})
+    
     le = LabelEncoder()
     df["Material_Code"] = le.fit_transform(df["Material_Type"])
     df["Certification_Code"] = le.fit_transform(df["Certifications"].astype(str))
+    
     imputer = SimpleImputer(strategy='mean')
     df[df.select_dtypes(include='number').columns] = imputer.fit_transform(df.select_dtypes(include='number'))
+    
     return df
 
 def plot_correlation(df):
@@ -74,7 +77,7 @@ def main():
     logistic_regression_analysis(df)
     decision_tree_analysis(df)
     kmeans_clustering(df)
-    print("✅ Analysis complete.")
+
 
 if __name__ == "__main__":
     main()
