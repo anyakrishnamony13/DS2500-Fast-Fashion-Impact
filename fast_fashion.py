@@ -60,7 +60,7 @@ def sustainability_rating_violin_plots(df):
     plt.savefig('sustainability_rating_violinplots.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("Sustainability rating violin plots saved")
+    
 
 def price_vs_environmental_metrics(df):
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
@@ -107,7 +107,7 @@ def price_vs_environmental_metrics(df):
     plt.savefig('price_vs_environmental_metrics.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("Price vs environmental metrics plots saved")
+
 
 def environmental_impact_by_year(df):
     yearly_data = df.groupby("Year")[["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]].mean().reset_index()
@@ -147,7 +147,7 @@ def environmental_impact_by_year(df):
     plt.savefig('environmental_impact_by_year.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("Environmental impact by year plots saved")
+    
 
 def material_type_environmental_comparison(df):
     fig, axes = plt.subplots(1, 3, figsize=(20, 7))
@@ -239,8 +239,7 @@ def material_type_environmental_comparison(df):
     plt.savefig('material_radar_chart.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("Material type environmental comparison plots saved")
-
+    
 def eco_friendly_manufacturing_comparison(df):
     if df['Eco_Friendly_Manufacturing'].dtype == 'object':
         eco_values = {'Yes': 1, 'No': 0}
@@ -313,7 +312,6 @@ def eco_friendly_manufacturing_comparison(df):
     plt.savefig('eco_friendly_manufacturing_violins.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("Eco-friendly manufacturing comparison plots saved")
 
 # def product_line_diversity_impact(df):
 
@@ -420,8 +418,7 @@ def certifications_analysis(df):
         plt.close()
         
         print("Certifications analysis plots saved")
-    else:
-        print("No 'Certifications' column found in the dataset")
+  
 
 # def correlation_matrix(df):
 
