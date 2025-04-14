@@ -5,7 +5,7 @@ Final Project: Environmental Impact of Fast Fashion Brands
 '''
 
 import matplotlib
-matplotlib.use('Agg') 
+matplotlib.use('Agg')  # Use non-interactive backend
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,6 +31,7 @@ def load_and_clean_data():
     fashion_df['Year'] = pd.to_numeric(fashion_df['Year'], errors='coerce')
     fashion_df = fashion_df.dropna(subset=["Sustainability_Rating"] + numeric_cols)
     
+    print(f"Data loaded with {len(fashion_df)} rows")
     return fashion_df
 
 def price_vs_environmental_metrics(df):
@@ -77,6 +78,7 @@ def price_vs_environmental_metrics(df):
     plt.tight_layout()
     plt.savefig('price_vs_environmental_metrics.png', dpi=300, bbox_inches='tight')
     plt.close()
+ 
 
 def environmental_impact_by_year(df):
     yearly_data = df.groupby("Year")[["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]].mean().reset_index()
@@ -121,18 +123,20 @@ def material_impact_analysis(df):
     plt.tight_layout()
     plt.savefig('material_impact_heatmap.png', dpi=300, bbox_inches='tight')
     plt.close()
+ 
 
 def main():
-    # Load and clean the data
+
+
     df = load_and_clean_data()
     
-    # Run key visualization functions
+
     price_vs_environmental_metrics(df)
     environmental_impact_by_year(df)
     material_impact_analysis(df)
+    
 
 
 if __name__ == "__main__":
     main()
-
 
