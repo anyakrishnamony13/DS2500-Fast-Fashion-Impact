@@ -31,11 +31,6 @@ def clean_and_prepare(df):
     
     return df
 
-def plot_correlation(df):
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
-    plt.title("Correlation Heatmap")
-    plt.show()
 
 def linear_regression_analysis(df):
     X = df[["Water_Usage_Liters", "Carbon_Footprint_MT", "Eco_Friendly_Manufacturing", "Material_Code"]]
@@ -75,7 +70,6 @@ def kmeans_clustering(df):
 def main():
     df = pd.read_csv("Sustainable Fashion Export 2025-04-06 19-58-02.csv")
     df = clean_and_prepare(df)
-    plot_correlation(df)
     linear_regression_analysis(df)
     logistic_regression_analysis(df)
     decision_tree_analysis(df)
