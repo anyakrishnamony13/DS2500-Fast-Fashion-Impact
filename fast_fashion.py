@@ -18,6 +18,7 @@ from sklearn.cluster import KMeans
 def clean_and_prepare(df):
     df.columns = df.columns.str.strip()
     df["Sustainability_Score"] = df["Sustainability_Rating"].map({"A": 4, "B": 3, "C": 2, "D": 1})
+    
     df["Eco_Friendly_Manufacturing"] = df["Eco_Friendly_Manufacturing"].map({"Yes": 1, "No": 0})
     df["Recycling_Programs"] = df["Recycling_Programs"].map({"Yes": 1, "No": 0})
     
@@ -70,7 +71,7 @@ def kmeans_clustering(df):
     plt.show()
 
 def main():
-    df = pd.read_csv("fashion_data.csv")
+    df = pd.read_csv("fSustainable Fashion Export 2025-04-06 19-58-02.csv")
     df = clean_and_prepare(df)
     plot_correlation(df)
     linear_regression_analysis(df)
