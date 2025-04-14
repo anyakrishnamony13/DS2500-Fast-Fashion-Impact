@@ -10,14 +10,14 @@ import numpy as np
 import seaborn as sns
 
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')  
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 import warnings
-warnings.filterwarnings("ignore")  # Suppress warnings
+warnings.filterwarnings("ignore")  
 
 FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
 
@@ -58,24 +58,24 @@ def country_sustainability_analysis(df):
         max_val = country_metrics[metric].max()
         country_metrics[f"{metric}_Normalized"] = (country_metrics[metric] - min_val) / (max_val - min_val)
     
-    # Calculate average of normalized values (lower is better)
+    
     country_metrics['Environmental_Impact_Score'] = country_metrics[[f"{m}_Normalized" for m in metrics]].mean(axis=1)
     
-    # Sort by environmental impact score (ascending for better visualization - lower impact at top)
+    
     country_metrics = country_metrics.sort_values('Environmental_Impact_Score')
     
-    # Create visualization
+ 
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
     
-    # Bar chart for each metric
+
     for i, metric in enumerate(metrics):
         row, col = i // 2, i % 2
         
-        # Create horizontal bar chart
+   
         bars = axes[row, col].barh(country_metrics['Country'], country_metrics[metric], 
                               color=plt.cm.viridis(country_metrics['Environmental_Impact_Score']))
         
-        # Add value labels
+  
         for bar in bars:
             width = bar.get_width()
             label_x_pos = width * 1.02
@@ -86,8 +86,11 @@ def country_sustainability_analysis(df):
         axes[row, col].grid(axis='x', linestyle='--', alpha=0.7)
     
     # Overall Environmental Impact Score (lower is better)
+        
     bars = axes[1, 1].barh(country_metrics['Country'], country_metrics['Environmental_Impact_Score'], 
                       color=plt.cm.viridis(country_metrics['Environmental_Impact_Score']))
+    
+        
     
     # Add value labels
     for bar in bars:
@@ -101,28 +104,29 @@ def country_sustainability_analysis(df):
     
     plt.tight_layout()
     plt.savefig('country_sustainability.png', dpi=300, bbox_inches='tight')
+    plt.show()
     plt.close()
+
     
 def material_type_impact_analysis(df):
-    """Analyze environmental impact by material type with better visualizations"""
-    # Metrics to analyze
+    
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     titles = ["Carbon Footprint (MT)", "Water Usage (Liters)", "Waste Production (KG)"]
     
-    # Get material impact data
+  
     material_impact = df.groupby('Material_Type')[metrics].mean()
     
-    # Sort materials by number of brands using them (to get the most common materials)
+
     material_counts = df['Material_Type'].value_counts()
     top_materials = material_counts.head(8).index.tolist()
     
-    # Filter to top materials
+   
     material_impact = material_impact.loc[top_materials]
     
-    # Create horizontal bar charts for each metric
+
     fig, axes = plt.subplots(3, 1, figsize=(12, 15))
     
-    # Define a consistent color palette
+
     colors = plt.cm.tab10(np.linspace(0, 1, len(top_materials)))
     
     for i, (metric, title) in enumerate(zip(metrics, titles)):
@@ -180,19 +184,20 @@ def material_type_impact_analysis(df):
     
     plt.tight_layout()
     plt.savefig('material_impact_grouped.png', dpi=300, bbox_inches='tight')
+    plt.show()
     plt.close()
+
     
 
 def sustainability_rating_validation(df):
-    """Validate if sustainability ratings correspond to actual environmental performance"""
-    # Metrics to analyze
+   
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     titles = ["Carbon Footprint (MT)", "Water Usage (Liters)", "Waste Production (KG)"]
     
-    # Calculate average metrics by sustainability rating
+  
     rating_performance = df.groupby('Sustainability_Rating')[metrics].mean().reset_index()
     
-    # Define the order of ratings
+    
     rating_order = ['A', 'B', 'C', 'D']
     rating_performance['Sustainability_Rating'] = pd.Categorical(
         rating_performance['Sustainability_Rating'],
@@ -201,14 +206,14 @@ def sustainability_rating_validation(df):
     )
     rating_performance = rating_performance.sort_values('Sustainability_Rating')
     
-    # Create visualization
+
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     
-    # Define colors - green for A to red for D
+
     colors = ['#2ca02c', '#7fbc41', '#f59a35', '#d62728']
     
     for i, (metric, title) in enumerate(zip(metrics, titles)):
-        # Create bar chart
+
         bars = axes[i].bar(
             rating_performance['Sustainability_Rating'],
             rating_performance[metric],
@@ -216,7 +221,7 @@ def sustainability_rating_validation(df):
             width=0.7
         )
         
-        # Add data labels
+
         for bar in bars:
             height = bar.get_height()
             axes[i].text(
@@ -228,8 +233,7 @@ def sustainability_rating_validation(df):
                 fontsize=11,
                 fontweight='bold'
             )
-        
-        # Add percentage difference between A and D ratings
+
         a_value = rating_performance[rating_performance['Sustainability_Rating'] == 'A'][metric].values[0]
         d_value = rating_performance[rating_performance['Sustainability_Rating'] == 'D'][metric].values[0]
         pct_diff = ((d_value - a_value) / d_value) * 100
@@ -250,16 +254,14 @@ def sustainability_rating_validation(df):
     
     plt.tight_layout()
     plt.savefig('sustainability_rating_validation.png', dpi=300, bbox_inches='tight')
+    plt.show()
     plt.close()
    
 
 def market_trend_correlation(df):
-    """Analyze correlation between market trends and sustainability practices"""
-    if 'Market_Trend' not in df.columns:
-        print("Market_Trend column not found in dataset")
-        return
-    
-    # Check the type of Market_Trend data
+  
+
+
     if df['Market_Trend'].dtype == 'object':
         print("Converting Market_Trend to numeric")
         # Try to map string values like 'Rising', 'Stable', 'Declining' to numbers
@@ -267,10 +269,10 @@ def market_trend_correlation(df):
         if all(trend in trend_map for trend in df['Market_Trend'].unique()):
             df['Market_Trend_Numeric'] = df['Market_Trend'].map(trend_map)
         else:
-            # Just use categorical values
+            
             df['Market_Trend_Numeric'] = pd.Categorical(df['Market_Trend']).codes
     else:
-        # If it's already numeric, use as is
+   
         df['Market_Trend_Numeric'] = df['Market_Trend']
     
     # Metrics to analyze
@@ -351,6 +353,7 @@ def market_trend_correlation(df):
     plt.title('Environmental Impact & Sustainability Rating by Market Trend', fontsize=16)
     plt.tight_layout()
     plt.savefig('market_trend_correlation.png', dpi=300, bbox_inches='tight')
+    plt.show()
     plt.close()
 
 
@@ -410,7 +413,7 @@ def environmental_impact_over_time(df):
                        fontsize=12, fontweight='bold', color=change_color,
                        bbox=dict(facecolor='white', alpha=0.8, boxstyle='round,pad=0.3'))
         
-        # Add title and labels
+
         axes[i].set_title(f'{title} Over Time', fontsize=14)
         axes[i].set_xlabel('Year', fontsize=12)
         axes[i].set_ylabel(title, fontsize=12)
@@ -483,18 +486,20 @@ def material_impact_over_time(df):
         
         plt.tight_layout()
         plt.savefig(f'material_impact_time_{metric}.png', dpi=300, bbox_inches='tight')
+        plt.show()
         plt.close()
     
   
 def main():
-    print("Starting improved sustainable fashion data analysis...")
+
     
-    # Load and clean the data
+
     df = load_and_clean_data()
     
     # Run analysis functions
     country_sustainability_analysis(df)
     material_type_impact_analysis(df)
+    
     sustainability_rating_validation(df)
     market_trend_correlation(df)
     
