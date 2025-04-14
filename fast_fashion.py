@@ -357,73 +357,7 @@ def market_trend_correlation(df):
     plt.close()
 
 
-def environmental_impact_over_time(df):
-    """Analyze changes in environmental impact metrics over time"""
-    # Check if we have multiple years
-    year_counts = df['Year'].value_counts()
-    valid_years = sorted(year_counts[year_counts > 5].index.tolist())
-    
-    if len(valid_years) <= 1:
-        print("Not enough years with sufficient data for time analysis")
-        return
-    
-    # Metrics to analyze
-    metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
-    titles = ["Carbon Footprint (MT)", "Water Usage (Liters)", "Waste Production (KG)"]
-    
-    # Create figure with multiple subplots
-    fig, axes = plt.subplots(3, 1, figsize=(14, 15))
-    
-    for i, (metric, title) in enumerate(zip(metrics, titles)):
-        # Calculate yearly averages
-        yearly_avg = df.groupby('Year')[metric].mean().reset_index()
-        yearly_avg = yearly_avg.sort_values('Year')
-        
-        # Create line plot
-        axes[i].plot(yearly_avg['Year'], yearly_avg[metric], 
-                    marker='o', linestyle='-', linewidth=2, color='blue',
-                    label='Overall Average')
-        
-        # Add data labels
-        for x, y in zip(yearly_avg['Year'], yearly_avg[metric]):
-            axes[i].text(x, y*1.02, f'{y:.1f}', ha='center', fontsize=9)
-        
-        # Also show by sustainability rating
-        for rating, color in zip(['A', 'B', 'C', 'D'], ['green', 'lightgreen', 'orange', 'red']):
-            rating_data = df[df['Sustainability_Rating'] == rating]
-            if len(rating_data) > 0:
-                rating_yearly = rating_data.groupby('Year')[metric].mean().reset_index()
-                if len(rating_yearly) > 1:  # Only plot if we have multiple years
-                    rating_yearly = rating_yearly.sort_values('Year')
-                    axes[i].plot(rating_yearly['Year'], rating_yearly[metric],
-                               marker='s', linestyle='--', linewidth=1.5, color=color,
-                               label=f'Rating {rating}')
-        
-        # Calculate and show percentage change from first to last year
-        if len(yearly_avg) >= 2:
-            first_val = yearly_avg.iloc[0][metric]
-            last_val = yearly_avg.iloc[-1][metric]
-            pct_change = ((last_val - first_val) / first_val) * 100
-            
-            change_text = f"Change: {pct_change:.1f}% from {yearly_avg.iloc[0]['Year']} to {yearly_avg.iloc[-1]['Year']}"
-            change_color = 'green' if pct_change < 0 else 'red'
-            
-            axes[i].text(0.5, 0.05, change_text,
-                       transform=axes[i].transAxes, ha='center',
-                       fontsize=12, fontweight='bold', color=change_color,
-                       bbox=dict(facecolor='white', alpha=0.8, boxstyle='round,pad=0.3'))
-        
 
-        axes[i].set_title(f'{title} Over Time', fontsize=14)
-        axes[i].set_xlabel('Year', fontsize=12)
-        axes[i].set_ylabel(title, fontsize=12)
-        axes[i].grid(True, linestyle='--', alpha=0.7)
-        axes[i].legend(loc='upper right')
-    
-    plt.tight_layout()
-    plt.savefig('environmental_impact_over_time.png', dpi=300, bbox_inches='tight')
-    plt.close()
-  
 
 def material_impact_over_time(df):
     """Analyze how material environmental impact has changed over time"""
@@ -505,7 +439,7 @@ def main():
     
     # Add the time analysis functions
     environmental_impact_over_time(df)
-    material_impact_over_time(df)
+
     
     print("All visualizations complete!")
 
