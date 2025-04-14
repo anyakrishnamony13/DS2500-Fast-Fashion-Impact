@@ -71,7 +71,7 @@ def kmeans_clustering(df):
     plt.show()
 
 def main():
-    df = pd.read_csv("fSustainable Fashion Export 2025-04-06 19-58-02.csv")
+    df = pd.read_csv("Sustainable Fashion Export 2025-04-06 19-58-02.csv")
     df = clean_and_prepare(df)
     plot_correlation(df)
     linear_regression_analysis(df)
