@@ -513,8 +513,66 @@ def certifications_analysis(df):
     else:
         print("No 'Certifications' column found in the dataset")
 
-# def market_trend_analysis(df):
+def main():
+    df = pd.read_csv("fast_fashion_dataset.csv")
+    df.columns = df.columns.str.strip()
 
+    rating_map = {"A": 4, "B": 3, "C": 2, "D": 1}
+    df["Sustainability_Score"] = df["Sustainability_Rating"].map(rating_map)
+    df["Eco_Friendly_Manufacturing"] = df["Eco_Friendly_Manufacturing"].map({"Yes": 1, "No": 0})
+    df["Recycling_Programs"] = df["Recycling_Programs"].map({"Yes": 1, "No": 0})
+
+    le = LabelEncoder()
+    df["Material_Code"] = le.fit_transform(df["Material_Type"])
+    df["Certification_Code"] = le.fit_transform(df["Certifications"].astype(str))
+
+    num_cols = df.select_dtypes(include='number').columns
+    imputer = SimpleImputer(strategy='mean')
+    df[num_cols] = imputer.fit_transform(df[num_cols])
+
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
+    plt.title("Correlation Heatmap")
+    plt.show()
+
+    X_lin = df[["Water_Usage_Liters", "Carbon_Footprint_MT", "Eco_Friendly_Manufacturing", "Material_Code"]]
+    y_lin = df["Waste_Production_KG"]
+    X_train, X_test, y_train, y_test = train_test_split(X_lin, y_lin, test_size=0.2, random_state=42)
+
+    lin_model = LinearRegression()
+    lin_model.fit(X_train, y_train)
+    print(f"Linear Regression R² Score: {lin_model.score(X_test, y_test):.4f}")
+
+    df["Is_Sustainable"] = df["Sustainability_Score"] >= 3
+    X_log = df[["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG", "Eco_Friendly_Manufacturing"]]
+    y_log = df["Is_Sustainable"]
+    X_train_log, X_test_log, y_train_log, y_test_log = train_test_split(X_log, y_log, test_size=0.2, random_state=42)
+
+    log_model = LogisticRegression()
+    log_model.fit(X_train_log, y_train_log)
+    y_pred_log = log_model.predict(X_test_log)
+    print(classification_report(y_test_log, y_pred_log))
+
+    tree_model = DecisionTreeClassifier(max_depth=4)
+    tree_model.fit(X_log, y_log)
+
+    plt.figure(figsize=(16, 10))
+    plot_tree(tree_model, feature_names=X_log.columns, class_names=["Unsustainable", "Sustainable"], filled=True)
+    plt.title("Decision Tree: Sustainability Classification")
+    plt.show()
+
+    X_cluster = df[["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]]
+    X_scaled = StandardScaler().fit_transform(X_cluster)
+
+    kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+    df["Cluster"] = kmeans.fit_predict(X_scaled)
+
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df, x="Carbon_Footprint_MT", y="Waste_Production_KG", hue="Cluster", palette="Set2")
+    plt.title("K-Means Clustering by Environmental Impact")
+    plt.show()
+
+    print("Analysis complete.")
 
 if __name__ == "__main__":
     main()
