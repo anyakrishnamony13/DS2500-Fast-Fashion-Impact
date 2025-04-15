@@ -18,25 +18,9 @@ plt.rcParams['font.size'] = 11  # Base font size
 plt.rcParams['axes.titlesize'] = 16  # Bigger title
 plt.rcParams['figure.titlesize'] = 18  # Figure title
 
-# Define medium-tone colors - darker than pastels but not too dark
-MEDIUM_COLORS = [
-    'lime',
-    'purple',
-    'orange',
-    'cyan',
-    'gray',
-    'blue',
-    'pink',
-    'red',
-    'teal',
-    'magenta',
-    'indigo',
-    'gold',
-    'maroon',
-    'navy',
-    'green',
-    'yellow'
-]
+# Use Seaborn's muted color palette
+sns.set_palette("muted")
+muted_colors = sns.color_palette("muted")
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     """Load and preprocess the environmental data."""
@@ -72,9 +56,9 @@ def plot_carbon_footprint_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot carbon footprint trend with medium green
+    # Plot carbon footprint trend with first muted color
     plt.plot(yearly['Year'], yearly['Carbon_Footprint_MT'], 
-             marker='o', linewidth=2.5, color='#7FB069')  # Medium sage green
+             marker='o', linewidth=2.5, color=muted_colors[0])
     
     plt.title('Average Carbon Footprint Over Time', fontsize=16)
     plt.xlabel('Year')
@@ -97,9 +81,9 @@ def plot_water_usage_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot water usage trend with medium blue
+    # Plot water usage trend with second muted color
     plt.plot(yearly['Year'], yearly['Water_Usage_Liters'], 
-             marker='o', linewidth=2.5, color='#6A8EAE')  # Medium steel blue
+             marker='o', linewidth=2.5, color=muted_colors[1])
     
     # Format y-axis for millions
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
@@ -125,9 +109,9 @@ def plot_waste_production_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot waste production trend with medium rose
+    # Plot waste production trend with third muted color
     plt.plot(yearly['Year'], yearly['Waste_Production_KG'], 
-             marker='o', linewidth=2.5, color='#C38D9E')  # Medium rose
+             marker='o', linewidth=2.5, color=muted_colors[2])
     
     # Format y-axis for thousands
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_thousands))
@@ -160,13 +144,13 @@ def analyze_sustainability_ratings(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Choose medium colors for the rating bars
-    rating_colors = [MEDIUM_COLORS[0], MEDIUM_COLORS[1], MEDIUM_COLORS[2], MEDIUM_COLORS[3]]
+    # Use muted colors for the rating bars
+    rating_colors = muted_colors[:len(rating_analysis)]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with medium colors
+    # Create bar chart with muted colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Carbon_Footprint_MT'],
                   color=rating_colors)
     
@@ -201,13 +185,13 @@ def analyze_sustainability_water(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Choose medium colors for the rating bars
-    rating_colors = [MEDIUM_COLORS[4], MEDIUM_COLORS[5], MEDIUM_COLORS[6], MEDIUM_COLORS[7]]
+    # Use muted colors for the rating bars (starting from a different point in palette)
+    rating_colors = muted_colors[2:2+len(rating_analysis)]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with medium colors
+    # Create bar chart with muted colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Water_Usage_Millions'],
                   color=rating_colors)
     
@@ -236,13 +220,16 @@ def analyze_material_impact(df):
     # Sort by carbon footprint
     material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Use medium colors for materials
-    material_colors = MEDIUM_COLORS[:len(material_analysis)]
+    # Create a color palette that cycles through the muted colors
+    n_materials = len(material_analysis)
+    material_colors = []
+    for i in range(n_materials):
+        material_colors.append(muted_colors[i % len(muted_colors)])
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with medium colors
+    # Plot horizontal bar chart with muted colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Carbon_Footprint_MT'], 
                    color=material_colors)
     
@@ -274,13 +261,16 @@ def analyze_material_water(df):
     # Sort by water usage
     material_analysis = material_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Use medium colors for materials
-    material_colors = MEDIUM_COLORS[5:5+len(material_analysis)]
+    # Create a color palette that cycles through the muted colors
+    n_materials = len(material_analysis)
+    material_colors = []
+    for i in range(n_materials):
+        material_colors.append(muted_colors[(i + 3) % len(muted_colors)])
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with medium colors
+    # Plot horizontal bar chart with muted colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Water_Usage_Millions'], 
                    color=material_colors)
     
@@ -309,13 +299,16 @@ def analyze_country_carbon(df):
     # Sort by carbon footprint for better visualization
     country_analysis = country_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Use medium colors for countries
-    country_colors = MEDIUM_COLORS[10:10+len(country_analysis)]
+    # Create a color palette that cycles through the muted colors
+    n_countries = len(country_analysis)
+    country_colors = []
+    for i in range(n_countries):
+        country_colors.append(muted_colors[i % len(muted_colors)])
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with medium colors
+    # Create horizontal bar chart with muted colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Carbon_Footprint_MT'],
                    color=country_colors)
     
@@ -347,16 +340,16 @@ def analyze_country_water(df):
     # Sort by water usage for better visualization
     country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Use medium colors for countries
-    country_colors = MEDIUM_COLORS[15:15+len(country_analysis)]
-    if len(country_colors) < len(country_analysis):
-        # If we need more colors than available, reuse from beginning
-        country_colors.extend(MEDIUM_COLORS[:len(country_analysis)-len(country_colors)])
+    # Create a color palette that cycles through the muted colors
+    n_countries = len(country_analysis)
+    country_colors = []
+    for i in range(n_countries):
+        country_colors.append(muted_colors[(i + 2) % len(muted_colors)])
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with medium colors
+    # Create horizontal bar chart with muted colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Water_Usage_Millions'],
                    color=country_colors)
     
@@ -386,18 +379,18 @@ def analyze_price_vs_carbon(df):
     # Create the scatter plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create a medium color map for sustainability ratings
+    # Create a color map for sustainability ratings from muted palette
     rating_to_color = {
-        'A': '#7FB069',  # Medium sage green
-        'B': '#6A8EAE',  # Medium steel blue
-        'C': '#9E7B9B',  # Medium mauve
-        'D': '#D4AC6E'   # Medium gold
+        'A': muted_colors[0],
+        'B': muted_colors[1],
+        'C': muted_colors[2],
+        'D': muted_colors[3]
     }
     
     # Map each point to its color based on rating
     colors = sample_df['Sustainability_Rating'].map(rating_to_color)
     
-    # Create scatter plot with medium colors
+    # Create scatter plot with muted colors
     plt.scatter(
         sample_df['Average_Price_USD'],
         sample_df['Carbon_Footprint_MT'],
@@ -412,7 +405,7 @@ def analyze_price_vs_carbon(df):
     
     # Calculate and plot trendline
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-    plt.plot(x, intercept + slope*x, '--', color='#8E7DAE', linewidth=2)  # Medium lavender for trend line
+    plt.plot(x, intercept + slope*x, '--', color=muted_colors[5], linewidth=2)  # Use a muted color for trend line
     
     # Add labels and title
     plt.xlabel('Average Price (USD)', fontsize=12)
@@ -447,13 +440,13 @@ def analyze_price_category_carbon(df):
         'Carbon_Footprint_MT': 'mean',
     }).reset_index()
     
-    # Use medium colors for price categories
-    price_colors = ['#7C98B3', '#8FB08C', '#D7BE69']  # Medium slate blue, medium mint, medium khaki
+    # Use muted colors for price categories
+    price_colors = [muted_colors[4], muted_colors[2], muted_colors[0]]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with medium colors
+    # Create bar chart with muted colors
     bars = plt.bar(category_data['Price_Category'], category_data['Carbon_Footprint_MT'],
                   color=price_colors)
     
@@ -480,10 +473,10 @@ def analyze_eco_friendly_carbon(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Use medium colors for eco-friendly claims
-    eco_colors = ['#8FB08C', '#B47B77']  # Medium mint, medium terracotta
+    # Use muted colors for eco-friendly claims
+    eco_colors = [muted_colors[0], muted_colors[3]]
     
-    # Create bar chart with medium colors
+    # Create bar chart with muted colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Carbon_Footprint_MT'],
                   color=eco_colors)
     
@@ -511,10 +504,10 @@ def analyze_eco_friendly_water(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Use medium colors for eco-friendly claims
-    eco_colors = ['#8FB08C', '#B47B77']  # Medium mint, medium terracotta
+    # Use muted colors for eco-friendly claims
+    eco_colors = [muted_colors[1], muted_colors[4]]
     
-    # Create bar chart with medium colors
+    # Create bar chart with muted colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Water_Usage_Millions'],
                   color=eco_colors)
     
@@ -530,7 +523,7 @@ def analyze_eco_friendly_water(df):
     return eco_analysis
 
 def main():
-    """Run all environmental impact analyses with medium-tone color schemes."""
+    """Run all environmental impact analyses with Seaborn's muted color scheme."""
     # Load the data
     df = load_data()
     
@@ -554,7 +547,7 @@ def main():
     eco_carbon = analyze_eco_friendly_carbon(df)
     eco_water = analyze_eco_friendly_water(df)
     
-    print("All visualizations have been created with medium-tone colors.")
+    print("All visualizations have been created with Seaborn's muted color palette.")
     print("Generated visualizations saved as PNG files in the current directory.")
 
 if __name__ == "__main__":
