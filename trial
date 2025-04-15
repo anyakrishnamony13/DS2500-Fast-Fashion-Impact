@@ -20,26 +20,22 @@ plt.rcParams['figure.titlesize'] = 18  # Figure title
 
 # Define medium-tone colors - darker than pastels but not too dark
 MEDIUM_COLORS = [
-    '#7FB069',  # Medium sage green
-    '#6A8EAE',  # Medium steel blue
-    '#9E7B9B',  # Medium mauve
-    '#D4AC6E',  # Medium gold
-    '#7C98B3',  # Medium slate blue
-    '#9D7EA7',  # Medium purple
-    '#C38D9E',  # Medium rose
-    '#76A5AF',  # Medium teal
-    '#8FB08C',  # Medium mint
-    '#D7BE69',  # Medium khaki
-    '#E09F7D',  # Medium peach
-    '#B47B77',  # Medium terracotta
-    '#8C9C9A',  # Medium sage gray
-    '#8E7DAE',  # Medium lavender
-    '#6A9788',  # Medium jade
-    '#C17C74',  # Medium coral
-    '#7DA4A9',  # Medium aqua
-    '#D0B069',  # Medium amber
-    '#8B7DAE',  # Medium periwinkle
-    '#808080'   # Medium gray
+    'lime',
+    'purple',
+    'orange',
+    'cyan',
+    'gray',
+    'blue',
+    'pink',
+    'red',
+    'teal',
+    'magenta',
+    'indigo',
+    'gold',
+    'maroon',
+    'navy',
+    'green',
+    'yellow'
 ]
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
