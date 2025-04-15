@@ -4,26 +4,17 @@ Final Project: Environmental Impact of Fast Fashion Brands
 4/1/25
 '''
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import seaborn as sns
-
 import matplotlib
 matplotlib.use('Agg')  
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import StandardScaler
 import warnings
 warnings.filterwarnings("ignore")  
 
 FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
 
 def load_and_clean_data():
-
-    
     fashion_df = pd.read_csv(FILENAME)
     fashion_df.columns = fashion_df.columns.str.strip()
     
@@ -37,45 +28,31 @@ def load_and_clean_data():
     
     fashion_df['Year'] = pd.to_numeric(fashion_df['Year'], errors='coerce')
     fashion_df = fashion_df.dropna(subset=["Sustainability_Rating"] + numeric_cols)
-    
-    
+
     return fashion_df
 
 def country_sustainability_analysis(df):
-   
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
-    
-
     country_metrics = df.groupby('Country')[metrics].mean().reset_index()
-    
 
     top_countries = df['Country'].value_counts().head(10).index.tolist()
     country_metrics = country_metrics[country_metrics['Country'].isin(top_countries)]
-    
- 
+
     for metric in metrics:
         min_val = country_metrics[metric].min()
         max_val = country_metrics[metric].max()
         country_metrics[f"{metric}_Normalized"] = (country_metrics[metric] - min_val) / (max_val - min_val)
-    
-    
+
     country_metrics['Environmental_Impact_Score'] = country_metrics[[f"{m}_Normalized" for m in metrics]].mean(axis=1)
-    
-    
     country_metrics = country_metrics.sort_values('Environmental_Impact_Score')
-    
- 
+
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    
 
     for i, metric in enumerate(metrics):
         row, col = i // 2, i % 2
-        
-   
         bars = axes[row, col].barh(country_metrics['Country'], country_metrics[metric], 
                               color=plt.cm.viridis(country_metrics['Environmental_Impact_Score']))
-        
-  
+
         for bar in bars:
             width = bar.get_width()
             label_x_pos = width * 1.02
@@ -86,12 +63,9 @@ def country_sustainability_analysis(df):
         axes[row, col].grid(axis='x', linestyle='--', alpha=0.7)
     
     # Overall Environmental Impact Score (lower is better)
-        
     bars = axes[1, 1].barh(country_metrics['Country'], country_metrics['Environmental_Impact_Score'], 
                       color=plt.cm.viridis(country_metrics['Environmental_Impact_Score']))
-    
-        
-    
+
     # Add value labels
     for bar in bars:
         width = bar.get_width()
@@ -107,26 +81,18 @@ def country_sustainability_analysis(df):
     plt.show()
     plt.close()
 
-    
 def material_type_impact_analysis(df):
-    
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     titles = ["Carbon Footprint (MT)", "Water Usage (Liters)", "Waste Production (KG)"]
-    
-  
+
     material_impact = df.groupby('Material_Type')[metrics].mean()
-    
 
     material_counts = df['Material_Type'].value_counts()
     top_materials = material_counts.head(8).index.tolist()
-    
-   
+
     material_impact = material_impact.loc[top_materials]
-    
 
     fig, axes = plt.subplots(3, 1, figsize=(12, 15))
-    
-
     colors = plt.cm.tab10(np.linspace(0, 1, len(top_materials)))
     
     for i, (metric, title) in enumerate(zip(metrics, titles)):
@@ -187,41 +153,30 @@ def material_type_impact_analysis(df):
     plt.show()
     plt.close()
 
-    
-
 def sustainability_rating_validation(df):
-   
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     titles = ["Carbon Footprint (MT)", "Water Usage (Liters)", "Waste Production (KG)"]
-    
-  
+
     rating_performance = df.groupby('Sustainability_Rating')[metrics].mean().reset_index()
-    
-    
     rating_order = ['A', 'B', 'C', 'D']
+
     rating_performance['Sustainability_Rating'] = pd.Categorical(
         rating_performance['Sustainability_Rating'],
         categories=rating_order,
         ordered=True
     )
     rating_performance = rating_performance.sort_values('Sustainability_Rating')
-    
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    
-
     colors = ['#2ca02c', '#7fbc41', '#f59a35', '#d62728']
     
     for i, (metric, title) in enumerate(zip(metrics, titles)):
-
         bars = axes[i].bar(
             rating_performance['Sustainability_Rating'],
             rating_performance[metric],
             color=colors,
             width=0.7
         )
-        
-
         for bar in bars:
             height = bar.get_height()
             axes[i].text(
@@ -256,12 +211,8 @@ def sustainability_rating_validation(df):
     plt.savefig('sustainability_rating_validation.png', dpi=300, bbox_inches='tight')
     plt.show()
     plt.close()
-   
 
 def market_trend_correlation(df):
-  
-
-
     if df['Market_Trend'].dtype == 'object':
         print("Converting Market_Trend to numeric")
         # Try to map string values like 'Rising', 'Stable', 'Declining' to numbers
@@ -269,12 +220,10 @@ def market_trend_correlation(df):
         if all(trend in trend_map for trend in df['Market_Trend'].unique()):
             df['Market_Trend_Numeric'] = df['Market_Trend'].map(trend_map)
         else:
-            
             df['Market_Trend_Numeric'] = pd.Categorical(df['Market_Trend']).codes
     else:
-   
         df['Market_Trend_Numeric'] = df['Market_Trend']
-    
+
     # Metrics to analyze
     metrics = ["Carbon_Footprint_MT", "Water_Usage_Liters", "Waste_Production_KG"]
     
@@ -283,8 +232,7 @@ def market_trend_correlation(df):
         metric: 'mean' for metric in metrics
     }).reset_index()
     
-    # Also get sustainability rating by market trend
-    # Convert ratings to numeric
+    # Also get sustainability rating by market trend, convert ratings to numeric
     rating_map = {'A': 4, 'B': 3, 'C': 2, 'D': 1}
     df['Rating_Numeric'] = df['Sustainability_Rating'].map(rating_map)
     
@@ -356,11 +304,7 @@ def market_trend_correlation(df):
     plt.show()
     plt.close()
 
-
-
-
 def material_impact_over_time(df):
-    """Analyze how material environmental impact has changed over time"""
     # Check if we have multiple years
     year_counts = df['Year'].value_counts()
     valid_years = sorted(year_counts[year_counts > 5].index.tolist())
@@ -425,9 +369,6 @@ def material_impact_over_time(df):
     
   
 def main():
-
-    
-
     df = load_and_clean_data()
     
     # Run analysis functions
@@ -436,11 +377,8 @@ def main():
     
     sustainability_rating_validation(df)
     market_trend_correlation(df)
-    
-    # Add the time analysis functions
-    environmental_impact_over_time(df)
+    material_impact_over_time(df)
 
-    
     print("All visualizations complete!")
 
 if __name__ == "__main__":
