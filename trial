@@ -24,7 +24,7 @@ plt.rcParams['axes.titlesize'] = 16
 plt.rcParams['figure.titlesize'] = 18  
 
 # Define custom colors - subdued but more distinctive palette
-custom_colors = ['#2E7D32', '#3182BD', '#8E44AD', '#D35400', '#C2185B']  # subdued green, clearer blue, nicer purple, subdued orange, deeper pink
+custom_colors = ['#2E7D32', '#3182BD', '#8E44AD', '#D35400', '#C2185B']  # colors like green and pink
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     """Load and preprocess the environmental data."""
