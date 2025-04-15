@@ -11,10 +11,13 @@ import numpy as np
 from matplotlib.ticker import FuncFormatter
 from scipy import stats
 
-# Set the style for cleaner plots
+# Set the style for cleaner plots with smaller size
 plt.style.use('seaborn-v0_8-whitegrid')
-sns.set_context("talk")
-plt.rcParams['figure.figsize'] = (12, 8)
+sns.set_context("notebook")  # Smaller context
+plt.rcParams['figure.figsize'] = (10, 6)  # Smaller figure size
+plt.rcParams['font.size'] = 11  # Base font size
+plt.rcParams['axes.titlesize'] = 16  # Bigger title
+plt.rcParams['figure.titlesize'] = 18  # Figure title
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     """Load and preprocess the environmental data."""
@@ -45,26 +48,16 @@ def plot_carbon_footprint_time(df):
     # Group by year
     yearly = df.groupby('Year').agg({
         'Carbon_Footprint_MT': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
-    yearly = yearly.rename(columns={'Brand_ID': 'Brand_Count'})
-    
     # Create the plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Plot carbon footprint trend
     sns.lineplot(data=yearly, x='Year', y='Carbon_Footprint_MT', 
                 marker='o', linewidth=2.5, color='#2ca02c')
     
-    # Add brand count as annotations
-    for x, y, count in zip(yearly['Year'], yearly['Carbon_Footprint_MT'], yearly['Brand_Count']):
-        plt.annotate(f'n={count}', (x, y), 
-                    textcoords="offset points", 
-                    xytext=(0, 10), 
-                    ha='center')
-    
-    plt.title('Average Carbon Footprint Over Time', fontsize=14)
+    plt.title('Average Carbon Footprint Over Time', fontsize=16)
     plt.xlabel('Year')
     plt.ylabel('Carbon Footprint (MT)')
     plt.grid(True, alpha=0.3)
@@ -80,13 +73,10 @@ def plot_water_usage_time(df):
     # Group by year
     yearly = df.groupby('Year').agg({
         'Water_Usage_Liters': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
-    yearly = yearly.rename(columns={'Brand_ID': 'Brand_Count'})
-    
     # Create the plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Plot water usage trend
     sns.lineplot(data=yearly, x='Year', y='Water_Usage_Liters', 
@@ -95,14 +85,7 @@ def plot_water_usage_time(df):
     # Format y-axis for millions
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
     
-    # Add brand count as annotations
-    for x, y, count in zip(yearly['Year'], yearly['Water_Usage_Liters'], yearly['Brand_Count']):
-        plt.annotate(f'n={count}', (x, y), 
-                    textcoords="offset points", 
-                    xytext=(0, 10), 
-                    ha='center')
-    
-    plt.title('Average Water Usage Over Time', fontsize=14)
+    plt.title('Average Water Usage Over Time', fontsize=16)
     plt.xlabel('Year')
     plt.ylabel('Water Usage (Million Liters)')
     plt.grid(True, alpha=0.3)
@@ -118,13 +101,10 @@ def plot_waste_production_time(df):
     # Group by year
     yearly = df.groupby('Year').agg({
         'Waste_Production_KG': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
-    yearly = yearly.rename(columns={'Brand_ID': 'Brand_Count'})
-    
     # Create the plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Plot waste production trend
     sns.lineplot(data=yearly, x='Year', y='Waste_Production_KG', 
@@ -133,14 +113,7 @@ def plot_waste_production_time(df):
     # Format y-axis for thousands
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_thousands))
     
-    # Add brand count as annotations
-    for x, y, count in zip(yearly['Year'], yearly['Waste_Production_KG'], yearly['Brand_Count']):
-        plt.annotate(f'n={count}', (x, y), 
-                    textcoords="offset points", 
-                    xytext=(0, 10), 
-                    ha='center')
-    
-    plt.title('Average Waste Production Over Time', fontsize=14)
+    plt.title('Average Waste Production Over Time', fontsize=16)
     plt.xlabel('Year')
     plt.ylabel('Waste Production (Thousand KG)')
     plt.grid(True, alpha=0.3)
@@ -156,7 +129,6 @@ def analyze_sustainability_ratings(df):
     # Group by sustainability rating
     rating_analysis = df.groupby('Sustainability_Rating').agg({
         'Carbon_Footprint_MT': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
     # Create categorical order for ratings
@@ -170,17 +142,13 @@ def analyze_sustainability_ratings(df):
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
     # Create the plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(9, 5.5))
     
     # Create bar chart
     sns.barplot(x='Sustainability_Rating', y='Carbon_Footprint_MT', 
                data=rating_analysis, palette='RdYlGn_r')
     
-    # Add brand count labels
-    for i, count in enumerate(rating_analysis['Brand_ID']):
-        plt.text(i, 5, f'n={count}', ha='center', fontsize=10)
-    
-    plt.title('Carbon Footprint by Sustainability Rating', fontsize=14)
+    plt.title('Carbon Footprint by Sustainability Rating', fontsize=16)
     plt.ylabel('Average Carbon Footprint (MT)')
     plt.xlabel('Sustainability Rating (A=Best to D=Worst)')
     plt.grid(True, alpha=0.3)
@@ -196,7 +164,6 @@ def analyze_sustainability_water(df):
     # Group by sustainability rating
     rating_analysis = df.groupby('Sustainability_Rating').agg({
         'Water_Usage_Liters': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
     # Convert to millions for readability
@@ -213,66 +180,19 @@ def analyze_sustainability_water(df):
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
     # Create the plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(9, 5.5))
     
     # Create bar chart
     sns.barplot(x='Sustainability_Rating', y='Water_Usage_Millions', 
                data=rating_analysis, palette='RdYlGn_r')
     
-    # Add brand count labels
-    for i, count in enumerate(rating_analysis['Brand_ID']):
-        plt.text(i, 0.2, f'n={count}', ha='center', fontsize=10)
-    
-    plt.title('Water Usage by Sustainability Rating', fontsize=14)
+    plt.title('Water Usage by Sustainability Rating', fontsize=16)
     plt.ylabel('Average Water Usage (Million Liters)')
     plt.xlabel('Sustainability Rating (A=Best to D=Worst)')
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
     plt.savefig('sustainability_rating_water.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    return rating_analysis
-
-def analyze_sustainability_waste(df):
-    """Analyze sustainability ratings vs waste production."""
-    # Group by sustainability rating
-    rating_analysis = df.groupby('Sustainability_Rating').agg({
-        'Waste_Production_KG': 'mean',
-        'Brand_ID': 'count'
-    }).reset_index()
-    
-    # Convert to tons for readability
-    rating_analysis['Waste_Production_Tons'] = rating_analysis['Waste_Production_KG'] / 1000
-    
-    # Create categorical order for ratings
-    rating_analysis['Sustainability_Rating'] = pd.Categorical(
-        rating_analysis['Sustainability_Rating'],
-        categories=['A', 'B', 'C', 'D'],
-        ordered=True
-    )
-    
-    # Sort by rating
-    rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    
-    # Create bar chart
-    sns.barplot(x='Sustainability_Rating', y='Waste_Production_Tons', 
-               data=rating_analysis, palette='RdYlGn_r')
-    
-    # Add brand count labels
-    for i, count in enumerate(rating_analysis['Brand_ID']):
-        plt.text(i, 2, f'n={count}', ha='center', fontsize=10)
-    
-    plt.title('Waste Production by Sustainability Rating', fontsize=14)
-    plt.ylabel('Average Waste Production (Tons)')
-    plt.xlabel('Sustainability Rating (A=Best to D=Worst)')
-    plt.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    plt.savefig('sustainability_rating_waste.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     return rating_analysis
@@ -292,17 +212,13 @@ def analyze_material_impact(df):
     material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
     # Create plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Plot horizontal bar chart
     sns.barplot(y='Material_Type', x='Carbon_Footprint_MT', 
                data=material_analysis, palette='viridis')
     
-    # Add brand count labels
-    for i, count in enumerate(material_analysis['Brand_ID']):
-        plt.text(5, i, f'n={count}', va='center', fontsize=9)
-    
-    plt.title('Carbon Footprint by Material Type', fontsize=14)
+    plt.title('Carbon Footprint by Material Type', fontsize=16)
     plt.xlabel('Average Carbon Footprint (MT)')
     plt.ylabel('Material Type')
     plt.grid(True, alpha=0.3)
@@ -331,17 +247,13 @@ def analyze_material_water(df):
     material_analysis = material_analysis.sort_values('Water_Usage_Millions', ascending=False)
     
     # Create plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Plot horizontal bar chart
     sns.barplot(y='Material_Type', x='Water_Usage_Millions', 
                data=material_analysis, palette='Blues_d')
     
-    # Add brand count labels
-    for i, count in enumerate(material_analysis['Brand_ID']):
-        plt.text(0.2, i, f'n={count}', va='center', fontsize=9)
-    
-    plt.title('Water Usage by Material Type', fontsize=14)
+    plt.title('Water Usage by Material Type', fontsize=16)
     plt.xlabel('Average Water Usage (Million Liters)')
     plt.ylabel('Material Type')
     plt.grid(True, alpha=0.3)
@@ -367,7 +279,7 @@ def analyze_country_carbon(df):
     country_analysis = country_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
     # Create the plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Create horizontal bar chart for easier reading with many countries
     sns.barplot(
@@ -377,11 +289,7 @@ def analyze_country_carbon(df):
         palette='viridis'
     )
     
-    # Add brand count labels
-    for i, count in enumerate(country_analysis['Brand_ID']):
-        plt.text(5, i, f'n={count}', va='center', fontsize=10)
-    
-    plt.title('Average Carbon Footprint by Country', fontsize=14)
+    plt.title('Average Carbon Footprint by Country', fontsize=16)
     plt.xlabel('Carbon Footprint (MT)')
     plt.ylabel('Country')
     plt.grid(True, alpha=0.3)
@@ -410,7 +318,7 @@ def analyze_country_water(df):
     country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=False)
     
     # Create the plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 6))
     
     # Create horizontal bar chart
     sns.barplot(
@@ -420,11 +328,7 @@ def analyze_country_water(df):
         palette='Blues_d'
     )
     
-    # Add brand count labels
-    for i, count in enumerate(country_analysis['Brand_ID']):
-        plt.text(0.2, i, f'n={count}', va='center', fontsize=10)
-    
-    plt.title('Average Water Usage by Country', fontsize=14)
+    plt.title('Average Water Usage by Country', fontsize=16)
     plt.xlabel('Water Usage (Million Liters)')
     plt.ylabel('Country')
     plt.grid(True, alpha=0.3)
@@ -439,8 +343,8 @@ def analyze_price_vs_carbon(df):
     """Create a simple, clean scatter plot of price vs carbon footprint."""
     
     # Create a cleaner dataset by randomly sampling to reduce overcrowding
-    if len(df) > 200:
-        sample_df = df.sample(200, random_state=42)
+    if len(df) > 150:  # Reduced sample size
+        sample_df = df.sample(150, random_state=42)
     else:
         sample_df = df
     
@@ -448,7 +352,7 @@ def analyze_price_vs_carbon(df):
     corr = sample_df['Average_Price_USD'].corr(sample_df['Carbon_Footprint_MT'])
     
     # Create the scatter plot
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(9, 5.5))
     
     # Create a scatter plot with transparency to help with overlap
     sns.scatterplot(
@@ -457,7 +361,7 @@ def analyze_price_vs_carbon(df):
         y='Carbon_Footprint_MT',
         hue='Sustainability_Rating',  # Color by sustainability rating
         palette='viridis',
-        s=100,  # Slightly larger point size
+        s=80,  # Slightly smaller point size
         alpha=0.7,  # Some transparency
     )
     
@@ -470,26 +374,15 @@ def analyze_price_vs_carbon(df):
     plt.plot(x, intercept + slope*x, 'r--', linewidth=2)
     
     # Add labels and title
-    plt.xlabel('Average Price (USD)', fontsize=14)
-    plt.ylabel('Carbon Footprint (MT)', fontsize=14)
+    plt.xlabel('Average Price (USD)', fontsize=12)
+    plt.ylabel('Carbon Footprint (MT)', fontsize=12)
     plt.title(f'Relationship Between Price and Carbon Footprint (r = {corr:.2f})', fontsize=16)
     
     # Add a grid
     plt.grid(True, alpha=0.3)
     
     # Add a legend
-    plt.legend(title='Sustainability Rating', title_fontsize=12)
-    
-    # Add text annotations for insights
-    if abs(corr) < 0.1:
-        insight = "No significant relationship between price and carbon footprint"
-    elif corr > 0:
-        insight = "Higher priced products tend to have HIGHER carbon footprints"
-    else:
-        insight = "Higher priced products tend to have LOWER carbon footprints"
-    
-    plt.figtext(0.5, 0.01, insight, ha='center', fontsize=14, 
-               bbox=dict(facecolor='white', alpha=0.8, boxstyle='round,pad=0.5'))
+    plt.legend(title='Sustainability Rating', title_fontsize=10)
     
     # Save the figure
     plt.tight_layout()
@@ -509,28 +402,22 @@ def analyze_price_category_carbon(df):
     # Calculate average carbon footprint by price category
     category_data = df.groupby('Price_Category').agg({
         'Carbon_Footprint_MT': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
     # Create the plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(9, 5.5))
     
     # Create bar chart
-    ax = sns.barplot(
+    sns.barplot(
         data=category_data,
         x='Price_Category',
         y='Carbon_Footprint_MT',
         palette='Blues_d'
     )
     
-    # Add the number of brands in each category
-    for i, row in enumerate(category_data.itertuples()):
-        ax.text(i, row.Carbon_Footprint_MT + 5, f'n={row.Brand_ID}', 
-               ha='center', va='bottom', fontsize=12)
-    
     # Add labels and title
-    plt.xlabel('Price Category', fontsize=14)
-    plt.ylabel('Average Carbon Footprint (MT)', fontsize=14)
+    plt.xlabel('Price Category', fontsize=12)
+    plt.ylabel('Average Carbon Footprint (MT)', fontsize=12)
     plt.title('Average Carbon Footprint by Price Category', fontsize=16)
     plt.grid(True, alpha=0.3)
     
@@ -546,11 +433,10 @@ def analyze_eco_friendly_carbon(df):
     # Group by eco-friendly manufacturing claims
     eco_analysis = df.groupby('Eco_Friendly_Manufacturing').agg({
         'Carbon_Footprint_MT': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
     # Create the plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(9, 5.5))
     
     # Create bar chart
     sns.barplot(
@@ -560,28 +446,10 @@ def analyze_eco_friendly_carbon(df):
         palette='Set2'
     )
     
-    # Add brand count labels
-    for i, count in enumerate(eco_analysis['Brand_ID']):
-        plt.text(i, 10, f'n={count}', ha='center', fontsize=12)
-    
-    plt.title('Carbon Footprint by Eco-Friendly Manufacturing Claims', fontsize=14)
+    plt.title('Carbon Footprint by Eco-Friendly Manufacturing Claims', fontsize=16)
     plt.xlabel('Eco-Friendly Claim')
     plt.ylabel('Average Carbon Footprint (MT)')
     plt.grid(True, alpha=0.3)
-    
-    # Calculate percent difference for insight
-    if 'Yes' in eco_analysis['Eco_Friendly_Manufacturing'].values and 'No' in eco_analysis['Eco_Friendly_Manufacturing'].values:
-        yes_carbon = eco_analysis[eco_analysis['Eco_Friendly_Manufacturing']=='Yes']['Carbon_Footprint_MT'].iloc[0]
-        no_carbon = eco_analysis[eco_analysis['Eco_Friendly_Manufacturing']=='No']['Carbon_Footprint_MT'].iloc[0]
-        pct_diff = ((yes_carbon / no_carbon) - 1) * 100
-        
-        if yes_carbon < no_carbon:
-            insight = f"Eco-friendly brands have {abs(pct_diff):.1f}% LOWER carbon footprint"
-        else:
-            insight = f"Eco-friendly brands have {pct_diff:.1f}% HIGHER carbon footprint (greenwashing concern)"
-        
-        plt.figtext(0.5, 0.01, insight, ha='center', fontsize=14, 
-                  bbox=dict(facecolor='white', alpha=0.8, boxstyle='round,pad=0.5'))
     
     plt.tight_layout()
     plt.savefig('eco_friendly_carbon.png', dpi=300, bbox_inches='tight')
@@ -594,14 +462,13 @@ def analyze_eco_friendly_water(df):
     # Group by eco-friendly manufacturing claims
     eco_analysis = df.groupby('Eco_Friendly_Manufacturing').agg({
         'Water_Usage_Liters': 'mean',
-        'Brand_ID': 'count'
     }).reset_index()
     
     # Convert to millions for readability
     eco_analysis['Water_Usage_Millions'] = eco_analysis['Water_Usage_Liters'] / 1000000
     
     # Create the plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(9, 5.5))
     
     # Create bar chart
     sns.barplot(
@@ -611,11 +478,7 @@ def analyze_eco_friendly_water(df):
         palette='Set2'
     )
     
-    # Add brand count labels
-    for i, count in enumerate(eco_analysis['Brand_ID']):
-        plt.text(i, 0.2, f'n={count}', ha='center', fontsize=12)
-    
-    plt.title('Water Usage by Eco-Friendly Manufacturing Claims', fontsize=14)
+    plt.title('Water Usage by Eco-Friendly Manufacturing Claims', fontsize=16)
     plt.xlabel('Eco-Friendly Claim')
     plt.ylabel('Average Water Usage (Million Liters)')
     plt.grid(True, alpha=0.3)
@@ -638,7 +501,6 @@ def main():
     
     rating_carbon = analyze_sustainability_ratings(df)
     rating_water = analyze_sustainability_water(df)
-    rating_waste = analyze_sustainability_waste(df)
     
     material_carbon = analyze_material_impact(df)
     material_water = analyze_material_water(df)
