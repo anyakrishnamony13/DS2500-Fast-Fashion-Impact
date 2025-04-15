@@ -1,0 +1,517 @@
+'''
+DS 2500
+Final Project: Environmental Impact of Fast Fashion Brands
+4/1/25
+'''
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from matplotlib.ticker import FuncFormatter
+from scipy import stats
+
+# Set the style for cleaner plots with smaller size
+plt.style.use('seaborn-v0_8-whitegrid')
+sns.set_context("notebook") 
+plt.rcParams['figure.figsize'] = (10, 6) 
+plt.rcParams['font.size'] = 11  
+plt.rcParams['axes.titlesize'] = 16  
+plt.rcParams['figure.titlesize'] = 18  
+
+# color palette (tried to do aesthetic colors)
+custom_colors = ['#2E7D32', '#3182BD', '#8E44AD', '#D35400', '#C2185B']  
+
+def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
+    """Load and preprocess the environmental data."""
+    df = pd.read_csv(filename)
+    
+    # Convert the numeric columns
+    numeric_columns = ['Carbon_Footprint_MT', 'Water_Usage_Liters', 
+                       'Waste_Production_KG', 'Average_Price_USD', 'Year']
+    for col in numeric_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    
+    # Convert the binary columns
+    df['Eco_Friendly'] = df['Eco_Friendly_Manufacturing'].map({'Yes': 1, 'No': 0})
+    df['Has_Recycling'] = df['Recycling_Programs'].map({'Yes': 1, 'No': 0})
+    
+    return df
+
+def format_millions(x, pos):
+    """Format large numbers in millions."""
+    return f'{x/1000000:.1f}M'
+
+def format_thousands(x, pos):
+    """Format numbers in thousands."""
+    return f'{x/1000:.1f}K'
+
+def plot_carbon_footprint_time(df):
+    """Plot carbon footprint trend over time."""
+    # group by years
+    yearly = df.groupby('Year').agg({
+        'Carbon_Footprint_MT': 'mean',
+    }).reset_index()
+    
+    # create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Plot carbon footprint trend (i used green for this)
+    plt.plot(yearly['Year'], yearly['Carbon_Footprint_MT'], 
+             marker='o', linewidth=2.5, color=custom_colors[0])
+    
+    plt.title('Average Carbon Footprint Over Time', fontsize=16)
+    plt.xlabel('Year')
+    plt.ylabel('Carbon Footprint (MT)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('carbon_footprint_time.png', dpi=300, bbox_inches='tight')
+    plt.show()  
+    plt.close()
+    
+    return yearly
+
+def plot_water_usage_time(df):
+    """Plot water usage trend over time."""
+    # Group by year
+    yearly = df.groupby('Year').agg({
+        'Water_Usage_Liters': 'mean',
+    }).reset_index()
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # used blue to plot usage trend 
+    plt.plot(yearly['Year'], yearly['Water_Usage_Liters'], 
+             marker='o', linewidth=2.5, color=custom_colors[1])
+    
+    # y axis - make sure its in millions
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
+    
+    plt.title('Average Water Usage Over Time', fontsize=16)
+    plt.xlabel('Year')
+    plt.ylabel('Water Usage (Million Liters)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('water_usage_time.png', dpi=300, bbox_inches='tight')
+    plt.show() 
+    plt.close()
+    
+    return yearly
+
+def plot_waste_production_time(df):
+    """Plot waste production trend over time."""
+    # Group by year
+    yearly = df.groupby('Year').agg({
+        'Waste_Production_KG': 'mean',
+    }).reset_index()
+    
+    # make the plot
+    plt.figure(figsize=(10, 6))
+    
+    # use purple to plot the waste production
+    plt.plot(yearly['Year'], yearly['Waste_Production_KG'], 
+             marker='o', linewidth=2.5, color=custom_colors[2])
+    
+    # format with thousands
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(format_thousands))
+    
+    plt.title('Average Waste Production Over Time', fontsize=16)
+    plt.xlabel('Year')
+    plt.ylabel('Waste Production (Thousand KG)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('waste_production_time.png', dpi=300, bbox_inches='tight')
+    plt.show()  
+    plt.close()
+    
+    return yearly
+
+def analyze_sustainability_ratings(df):
+    """Analyze sustainability ratings vs actual environmental impact."""
+    # group by the sustainability ratings
+    rating_analysis = df.groupby('Sustainability_Rating').agg({
+        'Carbon_Footprint_MT': 'mean',
+    }).reset_index()
+    
+    # categorize ratings
+    rating_analysis['Sustainability_Rating'] = pd.Categorical(
+        rating_analysis['Sustainability_Rating'],
+        categories=['A', 'B', 'C', 'D'],
+        ordered=True
+    )
+    
+    # sort the ratings
+    rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
+    
+    # use the custom colors for this
+    rating_colors = custom_colors[:len(rating_analysis)]
+    
+    # make the the plot
+    plt.figure(figsize=(9, 5.5))
+    
+    # create the bar graph using my designated colors
+    bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Carbon_Footprint_MT'],
+                  color=rating_colors)
+    
+    plt.title('Carbon Footprint Across Sustainability Ratings', fontsize=16)
+    plt.ylabel('Average Carbon Footprint (MT)')
+    plt.xlabel('Sustainability Rating (A:Best to D:Worst)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('sustainability_rating_carbon.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
+    plt.close()
+    
+    return rating_analysis
+
+def analyze_sustainability_water(df):
+    """Analyze sustainability ratings vs water usage."""
+    # group based on sustainability rating
+    rating_analysis = df.groupby('Sustainability_Rating').agg({
+        'Water_Usage_Liters': 'mean',
+    }).reset_index()
+    
+    # convert to millions
+    rating_analysis['Water_Usage_Millions'] = rating_analysis['Water_Usage_Liters'] / 1000000
+    
+    # Create categorical order for ratings
+    rating_analysis['Sustainability_Rating'] = pd.Categorical(
+        rating_analysis['Sustainability_Rating'],
+        categories=['A', 'B', 'C', 'D'],
+        ordered=True
+    )
+    
+    # Sort by rating
+    rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
+    
+    # Use custom colors for the rating bar
+    rating_colors = [custom_colors[1], custom_colors[2], custom_colors[3], custom_colors[4]]
+    rating_colors = rating_colors[:len(rating_analysis)]
+    
+    # make plot
+    plt.figure(figsize=(9, 5.5))
+    
+    # create bar chart
+    bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Water_Usage_Millions'],
+                  color=rating_colors)
+    
+    plt.title('Water Usage Across Sustainability Ratings', fontsize=16)
+    plt.ylabel('Average Water Usage (Million Liters)')
+    plt.xlabel('Sustainability Rating (A:Best to D:Worst)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('sustainability_rating_water.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
+    plt.close()
+    
+    return rating_analysis
+
+def analyze_material_impact(df):
+    """Analyze impact of different materials on the environment (carbon)."""
+    # group based on the material type
+    material_analysis = df.groupby('Material_Type').agg({
+        'Carbon_Footprint_MT': 'mean',
+        'Brand_ID': 'count'
+    }).reset_index()
+    
+    # only include the materials with sufficient samples
+    material_analysis = material_analysis[material_analysis['Brand_ID'] >= 2]
+    
+    # Sort by the carbon footprint
+    material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
+    
+    # cycle through the color palette
+    n_materials = len(material_analysis)
+    material_colors = []
+    for i in range(n_materials):
+        material_colors.append(custom_colors[i % len(custom_colors)])
+    
+    # Create plot
+    plt.figure(figsize=(10, 6))
+    
+    # plot the horizontal chart 
+    bars = plt.barh(material_analysis['Material_Type'], material_analysis['Carbon_Footprint_MT'], 
+                   color=material_colors)
+    
+    plt.title('Average Carbon Footprint by Material Type', fontsize=16)
+    plt.xlabel('Carbon Footprint (MT)')
+    plt.ylabel('Type of Material')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('material_carbon_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
+    plt.close()
+    
+    return material_analysis
+
+def analyze_material_water(df):
+    """Analyze impact of different materials on water usage."""
+    # group based on material type
+    material_analysis = df.groupby('Material_Type').agg({
+        'Water_Usage_Liters': 'mean',
+        'Brand_ID': 'count'
+    }).reset_index()
+    
+    # convert to millions
+    material_analysis['Water_Usage_Millions'] = material_analysis['Water_Usage_Liters'] / 1000000
+    
+    # Only include materials with sufficient samples
+    material_analysis = material_analysis[material_analysis['Brand_ID'] >= 2]
+    
+    # sort by water usage
+    material_analysis = material_analysis.sort_values('Water_Usage_Millions', ascending=True)
+    
+    # Create a color palette that cycles through the custom colors (shifted)
+    n_materials = len(material_analysis)
+    material_colors = []
+    for i in range(n_materials):
+        material_colors.append(custom_colors[(i + 2) % len(custom_colors)])
+    
+    # make  plot
+    plt.figure(figsize=(10, 6))
+    
+    # plot horizontal bar chart with custom colors
+    bars = plt.barh(material_analysis['Material_Type'], material_analysis['Water_Usage_Millions'], 
+                   color=material_colors)
+    
+    plt.title('Average Water Usage by Material Type', fontsize=16)
+    plt.xlabel(' Water Usage (Million Liters)')
+    plt.ylabel('Type of Material')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('material_water_impact.png', dpi=300, bbox_inches='tight')
+    plt.show() 
+    plt.close()
+    
+    return material_analysis
+
+def analyze_country_carbon(df):
+    """Analyze carbon footprint by country (top 5 only)."""
+    # Group by country
+    country_analysis = df.groupby('Country').agg({
+        'Carbon_Footprint_MT': 'mean',
+        'Brand_ID': 'count'
+    }).reset_index()
+    
+    # only include countries with sufficient samples - i think they should have at least 2 brands
+    country_analysis = country_analysis[country_analysis['Brand_ID'] >= 2]
+    
+    # only use 5 countries
+    country_analysis = country_analysis.sort_values('Carbon_Footprint_MT', ascending=False).head(5)
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Use custom colors for the countries
+    country_colors = custom_colors[:len(country_analysis)]
+    
+    # Create horizontal bar chart 
+    bars = plt.barh(country_analysis['Country'], country_analysis['Carbon_Footprint_MT'],
+                   color=country_colors)
+    
+    plt.title('Top 5 Countries with Highest Average Carbon Footprint', fontsize=16)
+    plt.xlabel('Average Carbon Footprint (MT)')
+    plt.ylabel('Country')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('country_carbon_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  
+    plt.close()
+    
+    return country_analysis
+
+def analyze_country_water(df):
+    """Analyze water usage by country (top 5 only)."""
+    # Group by country
+    country_analysis = df.groupby('Country').agg({
+        'Water_Usage_Liters': 'mean',
+        'Brand_ID': 'count'
+    }).reset_index()
+    
+    # Convert to millions for readability
+    country_analysis['Water_Usage_Millions'] = country_analysis['Water_Usage_Liters'] / 1000000
+    
+    # only use countries with at least 2 brands
+    country_analysis = country_analysis[country_analysis['Brand_ID'] >= 2]
+    
+    # take top 5 
+    country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=False).head(5)
+    
+    # make the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Use custom colors for the countries
+    country_colors = [custom_colors[1], custom_colors[0], custom_colors[2], custom_colors[3], custom_colors[4]]
+    
+    # Create horizontal bar chart with custom colors
+    bars = plt.barh(country_analysis['Country'], country_analysis['Water_Usage_Millions'],
+                   color=country_colors[:len(country_analysis)])
+    
+    plt.title('Top 5 Countries with Highest Water Usage', fontsize=16)
+    plt.xlabel('Average Water Usage (Million Liters)')
+    plt.ylabel('Country')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('country_water_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
+    plt.close()
+    
+    return country_analysis
+
+def analyze_price_vs_carbon(df):
+    """Create a scatter plot of price vs carbon footprint."""
+    
+    # Create a cleaner dataset by randomly sampling to reduce overcrowding
+    if len(df) > 150: 
+        sample_df = df.sample(150, random_state=42)
+    else:
+        sample_df = df
+    
+    # Calculate the correlation coefficient
+    corr = sample_df['Average_Price_USD'].corr(sample_df['Carbon_Footprint_MT'])
+    
+    # Create the scatter plot
+    plt.figure(figsize=(9, 5.5))
+    
+    # Create a color map for sustainability ratings from custom palette
+    rating_to_color = {
+        'A': custom_colors[0],
+        'B': custom_colors[1],
+        'C': custom_colors[2],
+        'D': custom_colors[3]
+    }
+    
+    # Map each point to its color based on rating
+    colors = sample_df['Sustainability_Rating'].map(rating_to_color)
+    
+    # Create scatter plot with custom colors
+    plt.scatter(
+        sample_df['Average_Price_USD'],
+        sample_df['Carbon_Footprint_MT'],
+        c=colors,
+        s=80,  # Size of points
+        alpha=0.7,  # Transparency
+    )
+    
+    # Add a trend line
+    x = sample_df['Average_Price_USD']
+    y = sample_df['Carbon_Footprint_MT']
+    
+    # Calculate and plot trendline
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+    plt.plot(x, intercept + slope*x, '--', color=custom_colors[4], linewidth=2)  # Use pink for trend line
+    
+    # Add labels and title
+    plt.xlabel('Average Price (USD)', fontsize=12)
+    plt.ylabel('Carbon Footprint (MT)', fontsize=12)
+    plt.title(f'Relationship Between Price and Carbon Footprint (r = {corr:.2f})', fontsize=16)
+    
+    # Add a grid
+    plt.grid(True, alpha=0.3)
+    
+    # Add a legend for sustainability ratings
+    for rating, color in rating_to_color.items():
+        plt.scatter([], [], c=color, s=80, label=f'Rating {rating}')
+    plt.legend(title='Sustainability Rating', title_fontsize=10)
+    
+
+
+
+def analyze_eco_friendly_carbon(df):
+    """Analyze whether eco-friendly claims match reality for carbon footprint."""
+    # Group by eco-friendly manufacturing claims
+    eco_analysis = df.groupby('Eco_Friendly_Manufacturing').agg({
+        'Carbon_Footprint_MT': 'mean',
+    }).reset_index()
+    
+    # Create the plot
+    plt.figure(figsize=(9, 5.5))
+    
+    # Use custom colors for eco-friendly claims
+    eco_colors = [custom_colors[0], custom_colors[3]]  # Green for Yes, Orange for No
+    
+    # Create bar chart with custom colors
+    bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Carbon_Footprint_MT'],
+                  color=eco_colors)
+    
+    plt.title('Carbon Footprint by Manufacturing Claim', fontsize=16)
+    plt.xlabel('Manufacturing Claim')
+    plt.ylabel('Average Carbon Footprint (MT)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('eco_friendly_carbon.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
+    plt.close()
+    
+    return eco_analysis
+
+def analyze_eco_friendly_water(df):
+    """Analyze whether eco-friendly claims match reality for water usage."""
+    # Group by eco-friendly manufacturing claims
+    eco_analysis = df.groupby('Eco_Friendly_Manufacturing').agg({
+        'Water_Usage_Liters': 'mean',
+    }).reset_index()
+    
+    # Convert to millions for readability
+    eco_analysis['Water_Usage_Millions'] = eco_analysis['Water_Usage_Liters'] / 1000000
+    
+    # Create the plot
+    plt.figure(figsize=(9, 5.5))
+    
+    # Use custom colors for eco-friendly claims
+    eco_colors = [custom_colors[1], custom_colors[4]]  # Blue for Yes, Pink for No
+    
+    # Create bar chart with custom colors
+    bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Water_Usage_Millions'],
+                  color=eco_colors)
+    
+    plt.title('Water Usage by Manufacturing Claims', fontsize=16)
+    plt.xlabel('Manufacturing Claim')
+    plt.ylabel('Average Water Usage (Million Liters)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('eco_friendly_water.png', dpi=300, bbox_inches='tight')
+    plt.show()  
+    plt.close()
+    
+    return eco_analysis
+
+def main():
+    """Run all environmental impact analyses with custom color scheme."""
+    # Load the data
+    df = load_data()
+    
+    # Generate visualizations (one graph per function)
+    carbon_time = plot_carbon_footprint_time(df)
+    water_time = plot_water_usage_time(df)
+    waste_time = plot_waste_production_time(df)
+    
+    rating_carbon = analyze_sustainability_ratings(df)
+    rating_water = analyze_sustainability_water(df)
+    
+    material_carbon = analyze_material_impact(df)
+    material_water = analyze_material_water(df)
+    
+    country_carbon = analyze_country_carbon(df)
+    country_water = analyze_country_water(df)
+    
+    price_correlation = analyze_price_vs_carbon(df)
+    
+    eco_carbon = analyze_eco_friendly_carbon(df)
+    eco_water = analyze_eco_friendly_water(df)
+    
+   
+if __name__ == "__main__":
+    main()
