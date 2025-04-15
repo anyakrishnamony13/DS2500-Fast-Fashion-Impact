@@ -4,404 +4,365 @@ Final Project: Environmental Impact of Fast Fashion Brands
 4/1/25
 '''
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
-from sklearn.preprocessing import StandardScaler
-import warnings
-warnings.filterwarnings("ignore")
+import numpy as np
+from matplotlib.ticker import FuncFormatter
 
-# Set styling options for better readability
-plt.style.use('seaborn-v0_8-whitegrid')
+# Set the style for our plots
+plt.style.use('ggplot')
 sns.set_palette('viridis')
-plt.rcParams['figure.figsize'] = (10, 6)
+plt.rcParams['figure.figsize'] = (12, 8)
 plt.rcParams['font.size'] = 12
 
-# Constants
-FILENAME = 'Sustainable Fashion Export 2025-04-06 19-58-02.csv'
-
-# 1. Data Loading and Preprocessing
-def load_and_preprocess_data(filename):
-    """Load and preprocess the sustainable fashion data."""
-    print(f"Loading data from {filename}...")
-    
-    # Load data
+# Load the data
+def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     df = pd.read_csv(filename)
     
-    # Convert relevant columns to numeric
-    numeric_cols = ['Carbon_Footprint_MT', 'Water_Usage_Liters', 
-                   'Waste_Production_KG', 'Product_Lines', 'Average_Price_USD']
-    for col in numeric_cols:
+    # Convert numeric columns
+    numeric_columns = ['Carbon_Footprint_MT', 'Water_Usage_Liters', 
+                       'Waste_Production_KG', 'Average_Price_USD', 'Year']
+    for col in numeric_columns:
         df[col] = pd.to_numeric(df[col], errors='coerce')
     
-    # Convert year to numeric
-    df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
-    
-    # Map sustainability ratings to numeric for correlation analysis
-    rating_map = {'A': 4, 'B': 3, 'C': 2, 'D': 1}
-    df['Rating_Numeric'] = df['Sustainability_Rating'].map(rating_map)
-    
-    # Binary features
+    # Convert binary columns
+    df['Eco_Friendly'] = df['Eco_Friendly_Manufacturing'].map({'Yes': 1, 'No': 0})
     df['Has_Recycling'] = df['Recycling_Programs'].map({'Yes': 1, 'No': 0})
-    df['Is_Eco_Friendly'] = df['Eco_Friendly_Manufacturing'].map({'Yes': 1, 'No': 0})
     
-    print(f"Loaded data with {df.shape[0]} brands and {df.shape[1]} features")
     return df
 
-# 2. Environmental Impact Over Time
-def plot_environmental_impact_over_time(df):
-    """Plot environmental metrics over time."""
-    print("Analyzing environmental impact trends over time...")
-    
-    # Group by year and calculate mean metrics
-    yearly_data = df.groupby('Year').agg({
-        'Carbon_Footprint_MT': 'mean',
-        'Water_Usage_Liters': 'mean',
-        'Waste_Production_KG': 'mean'
-    }).reset_index()
-    
-    # Create plots for each metric
-    fig, axes = plt.subplots(3, 1, figsize=(10, 15))
-    
-    # Carbon footprint over time
-    sns.lineplot(x='Year', y='Carbon_Footprint_MT', data=yearly_data, 
-                marker='o', linewidth=2, ax=axes[0])
-    axes[0].set_title('Average Carbon Footprint Over Time', fontsize=14)
-    axes[0].set_ylabel('Carbon Footprint (MT)')
-    
-    # Water usage over time (in millions of liters for readability)
-    yearly_data['Water_Usage_Millions'] = yearly_data['Water_Usage_Liters'] / 1000000
-    sns.lineplot(x='Year', y='Water_Usage_Millions', data=yearly_data, 
-                marker='o', linewidth=2, ax=axes[1])
-    axes[1].set_title('Average Water Usage Over Time', fontsize=14)
-    axes[1].set_ylabel('Water Usage (Millions of Liters)')
-    
-    # Waste production over time (in tons for readability)
-    yearly_data['Waste_Production_Tons'] = yearly_data['Waste_Production_KG'] / 1000
-    sns.lineplot(x='Year', y='Waste_Production_Tons', data=yearly_data, 
-                marker='o', linewidth=2, ax=axes[2])
-    axes[2].set_title('Average Waste Production Over Time', fontsize=14)
-    axes[2].set_ylabel('Waste Production (Tons)')
-    
-    plt.tight_layout()
-    plt.savefig('environmental_impact_over_time.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    return yearly_data
+# Helper function to format large numbers
+def format_millions(x, pos):
+    return f'{x/1000000:.1f}M'
 
-# 3. Sustainability Rating vs. Actual Impact
-def analyze_sustainability_rating_vs_impact(df):
-    """Analyze the relationship between sustainability ratings and actual environmental impact."""
-    print("Analyzing sustainability ratings vs. actual environmental impact...")
-    
-    # Group by sustainability rating
-    rating_impact = df.groupby('Sustainability_Rating').agg({
+def format_thousands(x, pos):
+    return f'{x/1000:.1f}K'
+
+# 1. Environmental metrics over time
+def plot_metrics_over_time(df):
+    # Group by year and calculate averages
+    yearly = df.groupby('Year').agg({
         'Carbon_Footprint_MT': 'mean',
         'Water_Usage_Liters': 'mean',
         'Waste_Production_KG': 'mean',
         'Brand_ID': 'count'
-    }).rename(columns={'Brand_ID': 'Count'}).reset_index()
+    }).reset_index()
     
-    # Sort ratings in correct order (A to D)
-    rating_impact['Sustainability_Rating'] = pd.Categorical(
-        rating_impact['Sustainability_Rating'], 
+    yearly = yearly.rename(columns={'Brand_ID': 'Brand_Count'})
+    
+    # Create figure with 3 subplots
+    fig, axes = plt.subplots(3, 1, figsize=(12, 15))
+    
+    # Plot 1: Carbon Footprint
+    sns.lineplot(data=yearly, x='Year', y='Carbon_Footprint_MT', 
+                marker='o', linewidth=2.5, color='#2ca02c', ax=axes[0])
+    
+    # Add brand count as annotations
+    for x, y, count in zip(yearly['Year'], yearly['Carbon_Footprint_MT'], yearly['Brand_Count']):
+        axes[0].annotate(f'n={count}', (x, y), 
+                        textcoords="offset points", 
+                        xytext=(0, 10), 
+                        ha='center')
+    
+    axes[0].set_title('Average Carbon Footprint Over Time', fontsize=14)
+    axes[0].set_xlabel('Year')
+    axes[0].set_ylabel('Carbon Footprint (MT)')
+    
+    # Plot 2: Water Usage
+    sns.lineplot(data=yearly, x='Year', y='Water_Usage_Liters', 
+                marker='o', linewidth=2.5, color='#1f77b4', ax=axes[1])
+    
+    # Format y-axis for millions
+    axes[1].yaxis.set_major_formatter(FuncFormatter(format_millions))
+    
+    axes[1].set_title('Average Water Usage Over Time', fontsize=14)
+    axes[1].set_xlabel('Year')
+    axes[1].set_ylabel('Water Usage (Liters)')
+    
+    # Plot 3: Waste Production
+    sns.lineplot(data=yearly, x='Year', y='Waste_Production_KG', 
+                marker='o', linewidth=2.5, color='#d62728', ax=axes[2])
+    
+    # Format y-axis for thousands
+    axes[2].yaxis.set_major_formatter(FuncFormatter(format_thousands))
+    
+    axes[2].set_title('Average Waste Production Over Time', fontsize=14)
+    axes[2].set_xlabel('Year')
+    axes[2].set_ylabel('Waste Production (KG)')
+    
+    plt.tight_layout()
+    plt.savefig('environmental_metrics_over_time.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    return yearly
+
+# 2. Sustainability rating reality check
+def analyze_sustainability_ratings(df):
+    # Group by sustainability rating
+    rating_analysis = df.groupby('Sustainability_Rating').agg({
+        'Carbon_Footprint_MT': 'mean',
+        'Water_Usage_Liters': 'mean',
+        'Waste_Production_KG': 'mean',
+        'Brand_ID': 'count'
+    }).reset_index()
+    
+    # Convert to readable units
+    rating_analysis['Water_Usage_Millions'] = rating_analysis['Water_Usage_Liters'] / 1000000
+    rating_analysis['Waste_Production_Tons'] = rating_analysis['Waste_Production_KG'] / 1000
+    
+    # Create categorical order for ratings
+    rating_analysis['Sustainability_Rating'] = pd.Categorical(
+        rating_analysis['Sustainability_Rating'],
         categories=['A', 'B', 'C', 'D'],
         ordered=True
     )
-    rating_impact = rating_impact.sort_values('Sustainability_Rating')
     
-    # Create a horizontal bar chart for easy comparison
-    fig, ax = plt.subplots(figsize=(12, 8))
+    # Sort by rating
+    rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Convert to more readable units
-    rating_impact['Water_Usage_Millions'] = rating_impact['Water_Usage_Liters'] / 1000000
-    rating_impact['Waste_Production_Tons'] = rating_impact['Waste_Production_KG'] / 1000
+    # Create a plot
+    fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Plot carbon footprint by rating
-    sns.barplot(x='Carbon_Footprint_MT', y='Sustainability_Rating', data=rating_impact, 
-               palette='RdYlGn_r', ax=ax)
+    # Plot with error bars
+    plot = sns.barplot(x='Sustainability_Rating', y='Carbon_Footprint_MT', 
+                      data=rating_analysis, palette='RdYlGn_r', ax=ax)
     
-    ax.set_title('Average Carbon Footprint by Sustainability Rating', fontsize=14)
-    ax.set_xlabel('Carbon Footprint (MT)')
-    ax.set_ylabel('Sustainability Rating (A=Best, D=Worst)')
+    # Add brand count labels
+    for i, count in enumerate(rating_analysis['Brand_ID']):
+        ax.text(i, 5, f'n={count}', ha='center', fontsize=10)
     
-    # Add count to y-axis labels
-    ylabels = [f"{rating} (n={count})" for rating, count in 
-              zip(rating_impact['Sustainability_Rating'], rating_impact['Count'])]
-    ax.set_yticklabels(ylabels)
-    
-    # Add a text box with insights
-    textstr = '\n'.join([
-        'Key Insights:',
-        f"A-rated brands: {rating_impact[rating_impact['Sustainability_Rating']=='A']['Carbon_Footprint_MT'].iloc[0]:.2f} MT",
-        f"D-rated brands: {rating_impact[rating_impact['Sustainability_Rating']=='D']['Carbon_Footprint_MT'].iloc[0]:.2f} MT"
-    ])
-    
-    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
-    ax.text(0.05, 0.05, textstr, transform=ax.transAxes, fontsize=12,
-            verticalalignment='bottom', bbox=props)
+    ax.set_title('Carbon Footprint by Sustainability Rating', fontsize=14)
+    ax.set_ylabel('Average Carbon Footprint (MT)')
+    ax.set_xlabel('Sustainability Rating (A=Best to D=Worst)')
     
     plt.tight_layout()
-    plt.savefig('sustainability_rating_vs_carbon.png', dpi=300, bbox_inches='tight')
+    plt.savefig('sustainability_rating_reality.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    # Create multi-metric comparison
-    fig, axes = plt.subplots(1, 3, figsize=(16, 6))
-    
-    # Carbon footprint
-    sns.barplot(x='Sustainability_Rating', y='Carbon_Footprint_MT', 
-               data=rating_impact, palette='RdYlGn_r', ax=axes[0])
-    axes[0].set_title('Carbon Footprint (MT)')
-    axes[0].set_xlabel('Rating')
-    
-    # Water usage
-    sns.barplot(x='Sustainability_Rating', y='Water_Usage_Millions', 
-               data=rating_impact, palette='RdYlGn_r', ax=axes[1])
-    axes[1].set_title('Water Usage (Million Liters)')
-    axes[1].set_xlabel('Rating')
-    
-    # Waste production
-    sns.barplot(x='Sustainability_Rating', y='Waste_Production_Tons', 
-               data=rating_impact, palette='RdYlGn_r', ax=axes[2])
-    axes[2].set_title('Waste Production (Tons)')
-    axes[2].set_xlabel('Rating')
-    
-    plt.suptitle('Environmental Impact Metrics by Sustainability Rating', fontsize=16)
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.85)
-    plt.savefig('sustainability_all_metrics.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    return rating_impact
+    return rating_analysis
 
-# 4. Impact of Material Type on Environment
+# 3. Material impact comparison
 def analyze_material_impact(df):
-    """Analyze the environmental impact of different material types."""
-    print("Analyzing impact of different materials on environmental metrics...")
-    
     # Group by material type
-    material_impact = df.groupby('Material_Type').agg({
+    material_analysis = df.groupby('Material_Type').agg({
         'Carbon_Footprint_MT': 'mean',
         'Water_Usage_Liters': 'mean',
         'Waste_Production_KG': 'mean',
         'Brand_ID': 'count'
-    }).rename(columns={'Brand_ID': 'Count'}).reset_index()
+    }).reset_index()
     
-    # Sort by carbon footprint for better visualization
-    material_impact = material_impact.sort_values('Carbon_Footprint_MT', ascending=False)
+    # Only include materials with sufficient samples
+    material_analysis = material_analysis[material_analysis['Brand_ID'] >= 2]
     
-    # Create a horizontal bar chart for easy comparison
+    # Sort by carbon footprint
+    material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
+    
+    # Create plot
     fig, ax = plt.subplots(figsize=(12, 8))
     
-    # Plot carbon footprint by material
-    sns.barplot(x='Carbon_Footprint_MT', y='Material_Type', data=material_impact, 
-               palette='viridis', ax=ax)
+    # Plot horizontal bar chart
+    sns.barplot(y='Material_Type', x='Carbon_Footprint_MT', 
+               data=material_analysis, palette='viridis', ax=ax)
     
-    ax.set_title('Average Carbon Footprint by Material Type', fontsize=14)
-    ax.set_xlabel('Carbon Footprint (MT)')
+    # Add brand count labels
+    for i, count in enumerate(material_analysis['Brand_ID']):
+        ax.text(5, i, f'n={count}', va='center', fontsize=9)
+    
+    ax.set_title('Carbon Footprint by Material Type', fontsize=14)
+    ax.set_xlabel('Average Carbon Footprint (MT)')
     ax.set_ylabel('Material Type')
     
-    # Add count to y-axis labels
-    ylabels = [f"{material} (n={count})" for material, count in 
-              zip(material_impact['Material_Type'], material_impact['Count'])]
-    ax.set_yticklabels(ylabels)
-    
-    # Highlight the best and worst materials
-    best_material = material_impact.iloc[-1]['Material_Type']
-    worst_material = material_impact.iloc[0]['Material_Type']
-    
-    # Add a text box with insights
-    textstr = '\n'.join([
-        'Key Insights:',
-        f"Highest impact: {worst_material} ({material_impact.iloc[0]['Carbon_Footprint_MT']:.2f} MT)",
-        f"Lowest impact: {best_material} ({material_impact.iloc[-1]['Carbon_Footprint_MT']:.2f} MT)"
-    ])
-    
-    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
-    ax.text(0.05, 0.05, textstr, transform=ax.transAxes, fontsize=12,
-            verticalalignment='bottom', bbox=props)
-    
     plt.tight_layout()
-    plt.savefig('material_carbon_impact.png', dpi=300, bbox_inches='tight')
+    plt.savefig('material_impact.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    return material_impact
+    return material_analysis
 
-# 5. Carbon Footprint vs. Price
+# 4. Improved price vs environmental impact visualization
 def analyze_price_vs_impact(df):
-    """Analyze the relationship between price and environmental impact."""
-    print("Analyzing relationship between price and environmental impact...")
-    
-    # Create scatter plot with regression line
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Plot individual data points
-    sns.scatterplot(x='Average_Price_USD', y='Carbon_Footprint_MT', 
-                   hue='Sustainability_Rating', size='Water_Usage_Liters',
-                   sizes=(50, 400), alpha=0.7, palette='viridis',
-                   data=df, ax=ax)
-    
-    # Add regression line
-    sns.regplot(x='Average_Price_USD', y='Carbon_Footprint_MT', 
-               data=df, scatter=False, ax=ax, color='red')
-    
-    # Calculate correlation coefficient and p-value
-    corr = df['Average_Price_USD'].corr(df['Carbon_Footprint_MT'])
-    
-    ax.set_title(f'Relationship Between Price and Carbon Footprint (r = {corr:.2f})', fontsize=14)
-    ax.set_xlabel('Average Price (USD)')
-    ax.set_ylabel('Carbon Footprint (MT)')
-    
-    plt.tight_layout()
-    plt.savefig('price_vs_carbon.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    # Create price categories for simplified bar chart
+    # Create price categories
     df['Price_Category'] = pd.qcut(df['Average_Price_USD'], 3, 
                                   labels=['Low', 'Medium', 'High'])
     
     # Group by price category
-    price_impact = df.groupby('Price_Category').agg({
+    price_analysis = df.groupby('Price_Category').agg({
         'Carbon_Footprint_MT': 'mean',
         'Water_Usage_Liters': 'mean',
         'Waste_Production_KG': 'mean',
+        'Average_Price_USD': 'mean',
         'Brand_ID': 'count'
-    }).rename(columns={'Brand_ID': 'Count'}).reset_index()
+    }).reset_index()
     
-    # Create bar chart for price categories
+    # Create plot
     fig, ax = plt.subplots(figsize=(10, 6))
     
+    # Bar plot
     sns.barplot(x='Price_Category', y='Carbon_Footprint_MT', 
-               data=price_impact, palette='Blues_d', ax=ax)
+               data=price_analysis, palette='Blues_d', ax=ax)
     
-    ax.set_title('Average Carbon Footprint by Price Category', fontsize=14)
-    ax.set_xlabel('Price Category')
+    # Add average price labels
+    for i, (count, price) in enumerate(zip(price_analysis['Brand_ID'], 
+                                         price_analysis['Average_Price_USD'])):
+        ax.text(i, 5, f'n={count}\n${price:.0f} avg', ha='center', fontsize=10)
+    
+    ax.set_title('Carbon Footprint by Price Category', fontsize=14)
     ax.set_ylabel('Average Carbon Footprint (MT)')
-    
-    # Add count labels
-    for i, v in enumerate(price_impact['Count']):
-        ax.text(i, 10, f"n={v}", ha='center')
+    ax.set_xlabel('Price Category')
     
     plt.tight_layout()
-    plt.savefig('price_category_impact.png', dpi=300, bbox_inches='tight')
+    plt.savefig('price_vs_impact.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    return price_impact
-
-# 6. Eco-Friendly Claims vs Reality
-def analyze_eco_friendly_claims(df):
-    """Analyze whether eco-friendly manufacturing claims match actual environmental footprints."""
-    print("Analyzing eco-friendly manufacturing claims vs. actual footprint...")
+    # Create binned scatter plot for better visualization
+    # of the relationship between price and carbon footprint
+    plt.figure(figsize=(10, 6))
     
-    # Group by eco-friendly manufacturing status
-    eco_impact = df.groupby('Eco_Friendly_Manufacturing').agg({
+    # Bin data points to avoid overcrowding
+    hexbin = plt.hexbin(df['Average_Price_USD'], df['Carbon_Footprint_MT'], 
+                       gridsize=20, cmap='viridis', mincnt=1)
+    
+    # Add a colorbar
+    cbar = plt.colorbar(hexbin)
+    cbar.set_label('Count in bin')
+    
+    # Calculate and plot trendline
+    z = np.polyfit(df['Average_Price_USD'], df['Carbon_Footprint_MT'], 1)
+    p = np.poly1d(z)
+    plt.plot(np.sort(df['Average_Price_USD']), 
+            p(np.sort(df['Average_Price_USD'])), 
+            "r--", linewidth=2)
+    
+    # Calculate correlation
+    corr = df['Average_Price_USD'].corr(df['Carbon_Footprint_MT'])
+    
+    plt.title(f'Relationship Between Price and Carbon Footprint (r = {corr:.2f})', fontsize=14)
+    plt.xlabel('Average Price (USD)')
+    plt.ylabel('Carbon Footprint (MT)')
+    
+    plt.tight_layout()
+    plt.savefig('price_impact_hexbin.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    return price_analysis
+
+# 5. Eco-friendly claims vs reality
+def analyze_eco_friendly_claims(df):
+    # Group by eco-friendly manufacturing claims
+    eco_analysis = df.groupby('Eco_Friendly_Manufacturing').agg({
         'Carbon_Footprint_MT': 'mean',
         'Water_Usage_Liters': 'mean',
         'Waste_Production_KG': 'mean',
         'Brand_ID': 'count'
-    }).rename(columns={'Brand_ID': 'Count'}).reset_index()
+    }).reset_index()
     
-    # Create multi-metric comparison
-    fig, axes = plt.subplots(1, 3, figsize=(16, 6))
+    # Convert to readable units
+    eco_analysis['Water_Usage_Millions'] = eco_analysis['Water_Usage_Liters'] / 1000000
+    eco_analysis['Waste_Production_Tons'] = eco_analysis['Waste_Production_KG'] / 1000
+    
+    # Create a multi-metric comparison
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     
     # Carbon footprint
     sns.barplot(x='Eco_Friendly_Manufacturing', y='Carbon_Footprint_MT', 
-               data=eco_impact, palette='RdYlGn_r', ax=axes[0])
+               data=eco_analysis, palette='Set2', ax=axes[0])
+    
+    # Add brand count labels
+    for i, count in enumerate(eco_analysis['Brand_ID']):
+        axes[0].text(i, 10, f'n={count}', ha='center', fontsize=10)
+    
     axes[0].set_title('Carbon Footprint (MT)')
     axes[0].set_xlabel('Eco-Friendly Claim')
     
-    # Water usage (in millions of liters for readability)
-    eco_impact['Water_Usage_Millions'] = eco_impact['Water_Usage_Liters'] / 1000000
+    # Water usage
     sns.barplot(x='Eco_Friendly_Manufacturing', y='Water_Usage_Millions', 
-               data=eco_impact, palette='RdYlGn_r', ax=axes[1])
+               data=eco_analysis, palette='Set2', ax=axes[1])
+    
     axes[1].set_title('Water Usage (Million Liters)')
     axes[1].set_xlabel('Eco-Friendly Claim')
     
-    # Waste production (in tons for readability)
-    eco_impact['Waste_Production_Tons'] = eco_impact['Waste_Production_KG'] / 1000
+    # Waste production
     sns.barplot(x='Eco_Friendly_Manufacturing', y='Waste_Production_Tons', 
-               data=eco_impact, palette='RdYlGn_r', ax=axes[2])
+               data=eco_analysis, palette='Set2', ax=axes[2])
+    
     axes[2].set_title('Waste Production (Tons)')
     axes[2].set_xlabel('Eco-Friendly Claim')
-    
-    # Add count labels to each bar
-    for i, ax in enumerate(axes):
-        for j, v in enumerate(eco_impact['Count']):
-            if i == 0:
-                ax.text(j, 10, f"n={v}", ha='center')
     
     plt.suptitle('Environmental Impact by Eco-Friendly Manufacturing Claims', fontsize=16)
     plt.tight_layout()
     plt.subplots_adjust(top=0.85)
-    plt.savefig('eco_friendly_claims_reality.png', dpi=300, bbox_inches='tight')
+    plt.savefig('eco_friendly_reality.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    # Calculate the percentage difference between Yes and No claims
-    yes_carbon = eco_impact[eco_impact['Eco_Friendly_Manufacturing'] == 'Yes']['Carbon_Footprint_MT'].iloc[0]
-    no_carbon = eco_impact[eco_impact['Eco_Friendly_Manufacturing'] == 'No']['Carbon_Footprint_MT'].iloc[0]
-    
-    pct_diff = ((yes_carbon - no_carbon) / no_carbon) * 100
-    
-    print(f"Brands claiming eco-friendly manufacturing have {pct_diff:.1f}% {'higher' if pct_diff > 0 else 'lower'} "
-          f"carbon footprint than those that don't claim eco-friendly practices.")
-    
-    return eco_impact
+    return eco_analysis
 
-# Main function to run all analyses
+# Main function
 def main():
-    """Run all environmental impact analyses."""
+    # Load the data
+    df = load_data()
     
-    # 1. Load and preprocess data
-    df = load_and_preprocess_data(FILENAME)
+    # Generate visualizations
+    yearly_trends = plot_metrics_over_time(df)
+    rating_analysis = analyze_sustainability_ratings(df)
+    material_analysis = analyze_material_impact(df)
+    price_analysis = analyze_price_vs_impact(df)
+    eco_analysis = analyze_eco_friendly_claims(df)
     
-    # 2. Environmental impact over time
-    yearly_data = plot_environmental_impact_over_time(df)
+    # Print insights
+    print("\n=== ENVIRONMENTAL IMPACT ANALYSIS RESULTS ===\n")
     
-    # 3. Sustainability rating vs. actual impact
-    rating_impact = analyze_sustainability_rating_vs_impact(df)
+    # Time trends
+    print("ENVIRONMENTAL METRICS OVER TIME:")
+    first_year = yearly_trends['Year'].min()
+    last_year = yearly_trends['Year'].max()
+    carbon_change = ((yearly_trends[yearly_trends['Year']==last_year]['Carbon_Footprint_MT'].values[0] / 
+                     yearly_trends[yearly_trends['Year']==first_year]['Carbon_Footprint_MT'].values[0]) - 1) * 100
     
-    # 4. Material impact on environment
-    material_impact = analyze_material_impact(df)
+    print(f"- From {first_year} to {last_year}, carbon footprint has {'increased' if carbon_change > 0 else 'decreased'} by {abs(carbon_change):.1f}%")
     
-    # 5. Price vs. environmental impact
-    price_impact = analyze_price_vs_impact(df)
+    # Sustainability ratings
+    print("\nSUSTAINABILITY RATING REALITY CHECK:")
+    if 'A' in rating_analysis['Sustainability_Rating'].values and 'D' in rating_analysis['Sustainability_Rating'].values:
+        a_carbon = rating_analysis[rating_analysis['Sustainability_Rating']=='A']['Carbon_Footprint_MT'].values[0]
+        d_carbon = rating_analysis[rating_analysis['Sustainability_Rating']=='D']['Carbon_Footprint_MT'].values[0]
+        pct_diff = ((a_carbon / d_carbon) - 1) * 100
+        
+        if a_carbon < d_carbon:
+            print(f"- VERIFIED: A-rated brands have {abs(pct_diff):.1f}% lower carbon footprint than D-rated brands")
+        else:
+            print(f"- CONCERNING: A-rated brands have {pct_diff:.1f}% higher carbon footprint than D-rated brands")
     
-    # 6. Eco-friendly claims vs. reality
-    eco_impact = analyze_eco_friendly_claims(df)
+    # Material impact
+    print("\nMATERIAL IMPACT:")
+    best_material = material_analysis.iloc[-1]
+    worst_material = material_analysis.iloc[0]
+    print(f"- Most eco-friendly material: {best_material['Material_Type']} ({best_material['Carbon_Footprint_MT']:.1f} MT carbon)")
+    print(f"- Least eco-friendly material: {worst_material['Material_Type']} ({worst_material['Carbon_Footprint_MT']:.1f} MT carbon)")
     
-    # Print summary insights
-    print("\n===== SUMMARY INSIGHTS =====")
-    print("1. SUSTAINABILITY RATINGS:")
-    if 'A' in rating_impact['Sustainability_Rating'].values and 'D' in rating_impact['Sustainability_Rating'].values:
-        a_carbon = rating_impact[rating_impact['Sustainability_Rating'] == 'A']['Carbon_Footprint_MT'].iloc[0]
-        d_carbon = rating_impact[rating_impact['Sustainability_Rating'] == 'D']['Carbon_Footprint_MT'].iloc[0]
-        print(f"   - A-rated brands average {a_carbon:.1f} MT carbon footprint")
-        print(f"   - D-rated brands average {d_carbon:.1f} MT carbon footprint")
-        print(f"   - {'CONCERNING: A-rated brands have higher footprint than D-rated' if a_carbon > d_carbon else 'GOOD: A-rated brands have lower footprint than D-rated'}")
-    
-    print("\n2. MATERIAL IMPACT:")
-    best_material = material_impact.iloc[-1]
-    worst_material = material_impact.iloc[0]
-    print(f"   - Most eco-friendly material: {best_material['Material_Type']} ({best_material['Carbon_Footprint_MT']:.1f} MT)")
-    print(f"   - Least eco-friendly material: {worst_material['Material_Type']} ({worst_material['Carbon_Footprint_MT']:.1f} MT)")
-    
-    print("\n3. PRICE VS. IMPACT:")
+    # Price vs Impact
+    print("\nPRICE VS ENVIRONMENTAL IMPACT:")
     corr = df['Average_Price_USD'].corr(df['Carbon_Footprint_MT'])
-    print(f"   - Correlation between price and carbon footprint: {corr:.2f}")
-    print(f"   - {'Higher-priced products tend to have HIGHER environmental impact' if corr > 0.1 else 'Higher-priced products tend to have LOWER environmental impact' if corr < -0.1 else 'Price shows little relationship with environmental impact'}")
+    if abs(corr) < 0.1:
+        relationship = "no significant relationship"
+    elif corr > 0:
+        relationship = f"positive relationship (r={corr:.2f}): higher prices correlate with higher carbon footprint"
+    else:
+        relationship = f"negative relationship (r={corr:.2f}): higher prices correlate with lower carbon footprint"
     
-    print("\n4. ECO-FRIENDLY CLAIMS:")
-    yes_carbon = eco_impact[eco_impact['Eco_Friendly_Manufacturing'] == 'Yes']['Carbon_Footprint_MT'].iloc[0]
-    no_carbon = eco_impact[eco_impact['Eco_Friendly_Manufacturing'] == 'No']['Carbon_Footprint_MT'].iloc[0]
-    pct_diff = ((yes_carbon - no_carbon) / no_carbon) * 100
+    print(f"- There is {relationship}")
     
-    print(f"   - Brands claiming eco-friendly practices: {pct_diff:.1f}% {'HIGHER' if pct_diff > 0 else 'LOWER'} carbon footprint")
-    print(f"   - {'GREENWASHING CONCERN: Eco-friendly claims do not match reality' if pct_diff > 0 else 'GOOD: Eco-friendly claims are supported by data'}")
+    # Eco-friendly claims
+    print("\nECO-FRIENDLY CLAIMS VS REALITY:")
+    yes_carbon = eco_analysis[eco_analysis['Eco_Friendly_Manufacturing']=='Yes']['Carbon_Footprint_MT'].values[0]
+    no_carbon = eco_analysis[eco_analysis['Eco_Friendly_Manufacturing']=='No']['Carbon_Footprint_MT'].values[0]
+    pct_diff = ((yes_carbon / no_carbon) - 1) * 100
     
-    print("\nAll visualizations have been saved to image files.")
+    if yes_carbon < no_carbon:
+        print(f"- VERIFIED: Brands claiming eco-friendly manufacturing have {abs(pct_diff):.1f}% lower carbon footprint")
+    else:
+        print(f"- GREENWASHING CONCERN: Brands claiming eco-friendly manufacturing have {pct_diff:.1f}% higher carbon footprint")
+    
+    print("\nAll visualizations have been saved as PNG files in the current directory.")
 
 if __name__ == "__main__":
     main()
