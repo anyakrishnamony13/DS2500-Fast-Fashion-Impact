@@ -4,7 +4,7 @@ Final Project: Environmental Impact of Fast Fashion Brands
 4/1/25
 '''
 
- import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
