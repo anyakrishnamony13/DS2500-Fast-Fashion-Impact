@@ -1,6 +1,8 @@
-"""
-
-"""
+'''
+DS 2500
+Final Project: Environmental Impact of Fast Fashion Brands
+4/1/25
+'''
 
 import matplotlib.pyplot as plt
 import pandas as pd
