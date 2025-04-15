@@ -3,11 +3,7 @@ DS 2500
 Final Project: Environmental Impact of Fast Fashion Brands
 4/1/25
 '''
-'''
-DS 2500
-Final Project: Environmental Impact of Fast Fashion Brands
-4/1/25
-'''
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,7 +20,7 @@ plt.rcParams['axes.titlesize'] = 16
 plt.rcParams['figure.titlesize'] = 18  
 
 # Define custom colors - subdued but more distinctive palette
-custom_colors = ['#2E7D32', '#3182BD', '#8E44AD', '#D35400', '#C2185B']  # colors like green and pink
+custom_colors = ['#2E7D32', '#3182BD', '#8E44AD', '#D35400', '#C2185B']  
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     """Load and preprocess the environmental data."""
@@ -71,6 +67,7 @@ def plot_carbon_footprint_time(df):
     
     plt.tight_layout()
     plt.savefig('carbon_footprint_time.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return yearly
@@ -99,6 +96,7 @@ def plot_water_usage_time(df):
     
     plt.tight_layout()
     plt.savefig('water_usage_time.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return yearly
@@ -127,6 +125,7 @@ def plot_waste_production_time(df):
     
     plt.tight_layout()
     plt.savefig('waste_production_time.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return yearly
@@ -165,6 +164,7 @@ def analyze_sustainability_ratings(df):
     
     plt.tight_layout()
     plt.savefig('sustainability_rating_carbon.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return rating_analysis
@@ -207,6 +207,7 @@ def analyze_sustainability_water(df):
     
     plt.tight_layout()
     plt.savefig('sustainability_rating_water.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return rating_analysis
@@ -245,6 +246,7 @@ def analyze_material_impact(df):
     
     plt.tight_layout()
     plt.savefig('material_carbon_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return material_analysis
@@ -286,6 +288,7 @@ def analyze_material_water(df):
     
     plt.tight_layout()
     plt.savefig('material_water_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return material_analysis
@@ -321,6 +324,7 @@ def analyze_country_carbon(df):
     
     plt.tight_layout()
     plt.savefig('country_carbon_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return country_analysis
@@ -359,6 +363,7 @@ def analyze_country_water(df):
     
     plt.tight_layout()
     plt.savefig('country_water_impact.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return country_analysis
@@ -422,6 +427,7 @@ def analyze_price_vs_carbon(df):
     # Save the figure
     plt.tight_layout()
     plt.savefig('price_vs_carbon_scatter.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return corr
@@ -458,6 +464,7 @@ def analyze_price_category_carbon(df):
     # Save the figure
     plt.tight_layout()
     plt.savefig('price_category_carbon.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return category_data
@@ -486,6 +493,7 @@ def analyze_eco_friendly_carbon(df):
     
     plt.tight_layout()
     plt.savefig('eco_friendly_carbon.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return eco_analysis
@@ -517,6 +525,7 @@ def analyze_eco_friendly_water(df):
     
     plt.tight_layout()
     plt.savefig('eco_friendly_water.png', dpi=300, bbox_inches='tight')
+    plt.show()  # Add this line to display the plot
     plt.close()
     
     return eco_analysis
