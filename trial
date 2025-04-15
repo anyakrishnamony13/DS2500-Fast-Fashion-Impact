@@ -12,11 +12,11 @@ from scipy import stats
 
 # Set the style for cleaner plots with smaller size
 plt.style.use('seaborn-v0_8-whitegrid')
-sns.set_context("notebook")  # Smaller context
-plt.rcParams['figure.figsize'] = (10, 6)  # Smaller figure size
-plt.rcParams['font.size'] = 11  # Base font size
-plt.rcParams['axes.titlesize'] = 16  # Bigger title
-plt.rcParams['figure.titlesize'] = 18  # Figure title
+sns.set_context("notebook") 
+plt.rcParams['figure.figsize'] = (10, 6) 
+plt.rcParams['font.size'] = 11  
+plt.rcParams['axes.titlesize'] = 16  
+plt.rcParams['figure.titlesize'] = 18  
 
 # Use Seaborn's muted color palette
 sns.set_palette("muted")
@@ -308,7 +308,7 @@ def analyze_country_carbon(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with muted colors
+    # Create horizontal bar chart 
     bars = plt.barh(country_analysis['Country'], country_analysis['Carbon_Footprint_MT'],
                    color=country_colors)
     
@@ -340,7 +340,7 @@ def analyze_country_water(df):
     # Sort by water usage for better visualization
     country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Create a color palette that cycles through the muted colors
+    # Create a color palette 
     n_countries = len(country_analysis)
     country_colors = []
     for i in range(n_countries):
@@ -547,8 +547,6 @@ def main():
     eco_carbon = analyze_eco_friendly_carbon(df)
     eco_water = analyze_eco_friendly_water(df)
     
-    print("All visualizations have been created with Seaborn's muted color palette.")
-    print("Generated visualizations saved as PNG files in the current directory.")
-
+   
 if __name__ == "__main__":
     main()
