@@ -14,11 +14,11 @@ import matplotlib.colors as mcolors
 
 # Set the style for cleaner plots with smaller size
 plt.style.use('seaborn-v0_8-whitegrid')
-sns.set_context("notebook")  # Smaller context
-plt.rcParams['figure.figsize'] = (10, 6)  # Smaller figure size
-plt.rcParams['font.size'] = 11  # Base font size
-plt.rcParams['axes.titlesize'] = 16  # Bigger title
-plt.rcParams['figure.titlesize'] = 18  # Figure title
+sns.set_context("notebook")  
+plt.rcParams['figure.figsize'] = (10, 6) 
+plt.rcParams['font.size'] = 11  
+plt.rcParams['axes.titlesize'] = 16 
+plt.rcParams['figure.titlesize'] = 18 
 
 # Define a function to generate purple palettes of different sizes
 def generate_purple_palette(n_colors):
@@ -71,7 +71,7 @@ def plot_carbon_footprint_time(df):
     
     # Plot carbon footprint trend with purple color
     plt.plot(yearly['Year'], yearly['Carbon_Footprint_MT'], 
-             marker='o', linewidth=2.5, color='#663399')  # Rebecca Purple
+             marker='o', linewidth=2.5, color='#663399') 
     
     plt.title('Average Carbon Footprint Over Time', fontsize=16)
     plt.xlabel('Year')
@@ -96,7 +96,7 @@ def plot_water_usage_time(df):
     
     # Plot water usage trend with light purple
     plt.plot(yearly['Year'], yearly['Water_Usage_Liters'], 
-             marker='o', linewidth=2.5, color='#9370DB')  # Medium Purple
+             marker='o', linewidth=2.5, color='#9370DB') 
     
     # Format y-axis for millions
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
@@ -262,7 +262,7 @@ def analyze_material_water(df):
         'Brand_ID': 'count'
     }).reset_index()
     
-    # Convert to millions for readability
+
     material_analysis['Water_Usage_Millions'] = material_analysis['Water_Usage_Liters'] / 1000000
     
     # Only include materials with sufficient samples
