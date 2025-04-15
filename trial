@@ -18,28 +18,28 @@ plt.rcParams['font.size'] = 11  # Base font size
 plt.rcParams['axes.titlesize'] = 16  # Bigger title
 plt.rcParams['figure.titlesize'] = 18  # Figure title
 
-# Define soft pastel colors
-PASTEL_COLORS = [
-    '#B6D7A8',  # Soft green
-    '#A4C2F4',  # Soft blue
-    '#D5A6BD',  # Soft pink
-    '#FFD966',  # Soft yellow
-    '#C9DAF8',  # Very soft blue
-    '#D9D2E9',  # Soft lavender
-    '#EAD1DC',  # Soft rose
-    '#CFE2F3',  # Pale blue
-    '#D9EAD3',  # Pale green
-    '#FFF2CC',  # Pale yellow
-    '#F9CB9C',  # Soft orange
-    '#E6B8AF',  # Soft salmon
-    '#D5D5D5',  # Soft gray
-    '#B4A7D6',  # Soft purple
-    '#A2C4C9',  # Soft teal
-    '#F4CCCC',  # Soft red
-    '#D0E0E3',  # Soft cyan
-    '#FFF2CC',  # Soft canary
-    '#D9D2E9',  # Soft periwinkle
-    '#D9EAD3'   # Soft mint
+# Define medium-tone colors - darker than pastels but not too dark
+MEDIUM_COLORS = [
+    '#7FB069',  # Medium sage green
+    '#6A8EAE',  # Medium steel blue
+    '#9E7B9B',  # Medium mauve
+    '#D4AC6E',  # Medium gold
+    '#7C98B3',  # Medium slate blue
+    '#9D7EA7',  # Medium purple
+    '#C38D9E',  # Medium rose
+    '#76A5AF',  # Medium teal
+    '#8FB08C',  # Medium mint
+    '#D7BE69',  # Medium khaki
+    '#E09F7D',  # Medium peach
+    '#B47B77',  # Medium terracotta
+    '#8C9C9A',  # Medium sage gray
+    '#8E7DAE',  # Medium lavender
+    '#6A9788',  # Medium jade
+    '#C17C74',  # Medium coral
+    '#7DA4A9',  # Medium aqua
+    '#D0B069',  # Medium amber
+    '#8B7DAE',  # Medium periwinkle
+    '#808080'   # Medium gray
 ]
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
@@ -76,9 +76,9 @@ def plot_carbon_footprint_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot carbon footprint trend with soft green
+    # Plot carbon footprint trend with medium green
     plt.plot(yearly['Year'], yearly['Carbon_Footprint_MT'], 
-             marker='o', linewidth=2.5, color='#B6D7A8')  # Soft green
+             marker='o', linewidth=2.5, color='#7FB069')  # Medium sage green
     
     plt.title('Average Carbon Footprint Over Time', fontsize=16)
     plt.xlabel('Year')
@@ -101,9 +101,9 @@ def plot_water_usage_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot water usage trend with soft blue
+    # Plot water usage trend with medium blue
     plt.plot(yearly['Year'], yearly['Water_Usage_Liters'], 
-             marker='o', linewidth=2.5, color='#A4C2F4')  # Soft blue
+             marker='o', linewidth=2.5, color='#6A8EAE')  # Medium steel blue
     
     # Format y-axis for millions
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
@@ -129,9 +129,9 @@ def plot_waste_production_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot waste production trend with soft pink
+    # Plot waste production trend with medium rose
     plt.plot(yearly['Year'], yearly['Waste_Production_KG'], 
-             marker='o', linewidth=2.5, color='#D5A6BD')  # Soft pink
+             marker='o', linewidth=2.5, color='#C38D9E')  # Medium rose
     
     # Format y-axis for thousands
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_thousands))
@@ -164,13 +164,13 @@ def analyze_sustainability_ratings(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Choose pastel colors for the rating bars
-    rating_colors = [PASTEL_COLORS[0], PASTEL_COLORS[1], PASTEL_COLORS[2], PASTEL_COLORS[3]]
+    # Choose medium colors for the rating bars
+    rating_colors = [MEDIUM_COLORS[0], MEDIUM_COLORS[1], MEDIUM_COLORS[2], MEDIUM_COLORS[3]]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with pastel colors
+    # Create bar chart with medium colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Carbon_Footprint_MT'],
                   color=rating_colors)
     
@@ -205,13 +205,13 @@ def analyze_sustainability_water(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Choose pastel colors for the rating bars
-    rating_colors = [PASTEL_COLORS[4], PASTEL_COLORS[5], PASTEL_COLORS[6], PASTEL_COLORS[7]]
+    # Choose medium colors for the rating bars
+    rating_colors = [MEDIUM_COLORS[4], MEDIUM_COLORS[5], MEDIUM_COLORS[6], MEDIUM_COLORS[7]]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with pastel colors
+    # Create bar chart with medium colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Water_Usage_Millions'],
                   color=rating_colors)
     
@@ -240,13 +240,13 @@ def analyze_material_impact(df):
     # Sort by carbon footprint
     material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Use pastel colors for materials
-    material_colors = PASTEL_COLORS[:len(material_analysis)]
+    # Use medium colors for materials
+    material_colors = MEDIUM_COLORS[:len(material_analysis)]
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with pastel colors
+    # Plot horizontal bar chart with medium colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Carbon_Footprint_MT'], 
                    color=material_colors)
     
@@ -278,13 +278,13 @@ def analyze_material_water(df):
     # Sort by water usage
     material_analysis = material_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Use pastel colors for materials
-    material_colors = PASTEL_COLORS[5:5+len(material_analysis)]
+    # Use medium colors for materials
+    material_colors = MEDIUM_COLORS[5:5+len(material_analysis)]
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with pastel colors
+    # Plot horizontal bar chart with medium colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Water_Usage_Millions'], 
                    color=material_colors)
     
@@ -313,13 +313,13 @@ def analyze_country_carbon(df):
     # Sort by carbon footprint for better visualization
     country_analysis = country_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Use pastel colors for countries
-    country_colors = PASTEL_COLORS[10:10+len(country_analysis)]
+    # Use medium colors for countries
+    country_colors = MEDIUM_COLORS[10:10+len(country_analysis)]
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with pastel colors
+    # Create horizontal bar chart with medium colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Carbon_Footprint_MT'],
                    color=country_colors)
     
@@ -351,16 +351,16 @@ def analyze_country_water(df):
     # Sort by water usage for better visualization
     country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Use pastel colors for countries
-    country_colors = PASTEL_COLORS[15:15+len(country_analysis)]
+    # Use medium colors for countries
+    country_colors = MEDIUM_COLORS[15:15+len(country_analysis)]
     if len(country_colors) < len(country_analysis):
         # If we need more colors than available, reuse from beginning
-        country_colors.extend(PASTEL_COLORS[:len(country_analysis)-len(country_colors)])
+        country_colors.extend(MEDIUM_COLORS[:len(country_analysis)-len(country_colors)])
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with pastel colors
+    # Create horizontal bar chart with medium colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Water_Usage_Millions'],
                    color=country_colors)
     
@@ -390,18 +390,18 @@ def analyze_price_vs_carbon(df):
     # Create the scatter plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create a pastel color map for sustainability ratings
+    # Create a medium color map for sustainability ratings
     rating_to_color = {
-        'A': '#B6D7A8',  # Soft green
-        'B': '#A4C2F4',  # Soft blue
-        'C': '#D5A6BD',  # Soft pink
-        'D': '#FFD966'   # Soft yellow
+        'A': '#7FB069',  # Medium sage green
+        'B': '#6A8EAE',  # Medium steel blue
+        'C': '#9E7B9B',  # Medium mauve
+        'D': '#D4AC6E'   # Medium gold
     }
     
     # Map each point to its color based on rating
     colors = sample_df['Sustainability_Rating'].map(rating_to_color)
     
-    # Create scatter plot with pastel colors
+    # Create scatter plot with medium colors
     plt.scatter(
         sample_df['Average_Price_USD'],
         sample_df['Carbon_Footprint_MT'],
@@ -416,7 +416,7 @@ def analyze_price_vs_carbon(df):
     
     # Calculate and plot trendline
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-    plt.plot(x, intercept + slope*x, '--', color='#B4A7D6', linewidth=2)  # Soft purple for trend line
+    plt.plot(x, intercept + slope*x, '--', color='#8E7DAE', linewidth=2)  # Medium lavender for trend line
     
     # Add labels and title
     plt.xlabel('Average Price (USD)', fontsize=12)
@@ -451,13 +451,13 @@ def analyze_price_category_carbon(df):
         'Carbon_Footprint_MT': 'mean',
     }).reset_index()
     
-    # Use pastel colors for price categories
-    price_colors = ['#CFE2F3', '#D9EAD3', '#FFF2CC']  # Pale blue, pale green, pale yellow
+    # Use medium colors for price categories
+    price_colors = ['#7C98B3', '#8FB08C', '#D7BE69']  # Medium slate blue, medium mint, medium khaki
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with pastel colors
+    # Create bar chart with medium colors
     bars = plt.bar(category_data['Price_Category'], category_data['Carbon_Footprint_MT'],
                   color=price_colors)
     
@@ -484,10 +484,10 @@ def analyze_eco_friendly_carbon(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Use pastel colors for eco-friendly claims
-    eco_colors = ['#D9EAD3', '#F4CCCC']  # Soft green, soft pink/red
+    # Use medium colors for eco-friendly claims
+    eco_colors = ['#8FB08C', '#B47B77']  # Medium mint, medium terracotta
     
-    # Create bar chart with pastel colors
+    # Create bar chart with medium colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Carbon_Footprint_MT'],
                   color=eco_colors)
     
@@ -515,10 +515,10 @@ def analyze_eco_friendly_water(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Use pastel colors for eco-friendly claims
-    eco_colors = ['#D9EAD3', '#F4CCCC']  # Soft green, soft pink/red
+    # Use medium colors for eco-friendly claims
+    eco_colors = ['#8FB08C', '#B47B77']  # Medium mint, medium terracotta
     
-    # Create bar chart with pastel colors
+    # Create bar chart with medium colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Water_Usage_Millions'],
                   color=eco_colors)
     
@@ -534,7 +534,7 @@ def analyze_eco_friendly_water(df):
     return eco_analysis
 
 def main():
-    """Run all environmental impact analyses with pastel color schemes."""
+    """Run all environmental impact analyses with medium-tone color schemes."""
     # Load the data
     df = load_data()
     
@@ -558,7 +558,7 @@ def main():
     eco_carbon = analyze_eco_friendly_carbon(df)
     eco_water = analyze_eco_friendly_water(df)
     
-    print("All visualizations have been created with soft pastel colors.")
+    print("All visualizations have been created with medium-tone colors.")
     print("Generated visualizations saved as PNG files in the current directory.")
 
 if __name__ == "__main__":
