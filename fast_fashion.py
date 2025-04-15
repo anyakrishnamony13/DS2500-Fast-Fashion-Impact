@@ -440,8 +440,6 @@ def main():
     # Add the time analysis functions
     environmental_impact_over_time(df)
 
-    
-    print("All visualizations complete!")
 
 if __name__ == "__main__":
     main()
