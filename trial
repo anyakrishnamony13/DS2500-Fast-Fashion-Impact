@@ -9,30 +9,38 @@ import seaborn as sns
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 from scipy import stats
-import matplotlib.colors as mcolors
 
 # Set the style for cleaner plots with smaller size
 plt.style.use('seaborn-v0_8-whitegrid')
-sns.set_context("notebook")  
-plt.rcParams['figure.figsize'] = (10, 6) 
-plt.rcParams['font.size'] = 11  
-plt.rcParams['axes.titlesize'] = 16 
-plt.rcParams['figure.titlesize'] = 18 
+sns.set_context("notebook")  # Smaller context
+plt.rcParams['figure.figsize'] = (10, 6)  # Smaller figure size
+plt.rcParams['font.size'] = 11  # Base font size
+plt.rcParams['axes.titlesize'] = 16  # Bigger title
+plt.rcParams['figure.titlesize'] = 18  # Figure title
 
-# Define a function to generate purple palettes of different sizes
-def generate_purple_palette(n_colors):
-    """Generate a palette of n different purple shades."""
-    purple_palette = []
-    
-    # Generate different shades of purple from light to dark
-    for i in range(n_colors):
-        # Calculate a value between 0.2 (light) and 0.8 (dark)
-        value = 0.2 + (0.6 * i / (n_colors - 1)) if n_colors > 1 else 0.5
-        # Create a purple color with varying brightness
-        color = mcolors.hsv_to_rgb([0.75, 0.8, 1 - value])  # Hue 0.75 is purple
-        purple_palette.append(color)
-    
-    return purple_palette
+# Define soft pastel colors
+PASTEL_COLORS = [
+    '#B6D7A8',  # Soft green
+    '#A4C2F4',  # Soft blue
+    '#D5A6BD',  # Soft pink
+    '#FFD966',  # Soft yellow
+    '#C9DAF8',  # Very soft blue
+    '#D9D2E9',  # Soft lavender
+    '#EAD1DC',  # Soft rose
+    '#CFE2F3',  # Pale blue
+    '#D9EAD3',  # Pale green
+    '#FFF2CC',  # Pale yellow
+    '#F9CB9C',  # Soft orange
+    '#E6B8AF',  # Soft salmon
+    '#D5D5D5',  # Soft gray
+    '#B4A7D6',  # Soft purple
+    '#A2C4C9',  # Soft teal
+    '#F4CCCC',  # Soft red
+    '#D0E0E3',  # Soft cyan
+    '#FFF2CC',  # Soft canary
+    '#D9D2E9',  # Soft periwinkle
+    '#D9EAD3'   # Soft mint
+]
 
 def load_data(filename='Sustainable Fashion Export 2025-04-06 19-58-02.csv'):
     """Load and preprocess the environmental data."""
@@ -68,9 +76,9 @@ def plot_carbon_footprint_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot carbon footprint trend with purple color
+    # Plot carbon footprint trend with soft green
     plt.plot(yearly['Year'], yearly['Carbon_Footprint_MT'], 
-             marker='o', linewidth=2.5, color='#663399') 
+             marker='o', linewidth=2.5, color='#B6D7A8')  # Soft green
     
     plt.title('Average Carbon Footprint Over Time', fontsize=16)
     plt.xlabel('Year')
@@ -93,9 +101,9 @@ def plot_water_usage_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot water usage trend with light purple
+    # Plot water usage trend with soft blue
     plt.plot(yearly['Year'], yearly['Water_Usage_Liters'], 
-             marker='o', linewidth=2.5, color='#9370DB') 
+             marker='o', linewidth=2.5, color='#A4C2F4')  # Soft blue
     
     # Format y-axis for millions
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_millions))
@@ -121,9 +129,9 @@ def plot_waste_production_time(df):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Plot waste production trend with dark purple
+    # Plot waste production trend with soft pink
     plt.plot(yearly['Year'], yearly['Waste_Production_KG'], 
-             marker='o', linewidth=2.5, color='#4B0082')  # Indigo
+             marker='o', linewidth=2.5, color='#D5A6BD')  # Soft pink
     
     # Format y-axis for thousands
     plt.gca().yaxis.set_major_formatter(FuncFormatter(format_thousands))
@@ -156,15 +164,15 @@ def analyze_sustainability_ratings(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(rating_analysis))
+    # Choose pastel colors for the rating bars
+    rating_colors = [PASTEL_COLORS[0], PASTEL_COLORS[1], PASTEL_COLORS[2], PASTEL_COLORS[3]]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with purple palette
+    # Create bar chart with pastel colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Carbon_Footprint_MT'],
-                  color=purple_palette)
+                  color=rating_colors)
     
     plt.title('Carbon Footprint by Sustainability Rating', fontsize=16)
     plt.ylabel('Average Carbon Footprint (MT)')
@@ -197,15 +205,15 @@ def analyze_sustainability_water(df):
     # Sort by rating
     rating_analysis = rating_analysis.sort_values('Sustainability_Rating')
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(rating_analysis))
+    # Choose pastel colors for the rating bars
+    rating_colors = [PASTEL_COLORS[4], PASTEL_COLORS[5], PASTEL_COLORS[6], PASTEL_COLORS[7]]
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with purple palette
+    # Create bar chart with pastel colors
     bars = plt.bar(rating_analysis['Sustainability_Rating'], rating_analysis['Water_Usage_Millions'],
-                  color=purple_palette)
+                  color=rating_colors)
     
     plt.title('Water Usage by Sustainability Rating', fontsize=16)
     plt.ylabel('Average Water Usage (Million Liters)')
@@ -232,15 +240,15 @@ def analyze_material_impact(df):
     # Sort by carbon footprint
     material_analysis = material_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(material_analysis))
+    # Use pastel colors for materials
+    material_colors = PASTEL_COLORS[:len(material_analysis)]
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with purple shades
+    # Plot horizontal bar chart with pastel colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Carbon_Footprint_MT'], 
-                   color=purple_palette)
+                   color=material_colors)
     
     plt.title('Carbon Footprint by Material Type', fontsize=16)
     plt.xlabel('Average Carbon Footprint (MT)')
@@ -261,7 +269,7 @@ def analyze_material_water(df):
         'Brand_ID': 'count'
     }).reset_index()
     
-
+    # Convert to millions for readability
     material_analysis['Water_Usage_Millions'] = material_analysis['Water_Usage_Liters'] / 1000000
     
     # Only include materials with sufficient samples
@@ -270,15 +278,15 @@ def analyze_material_water(df):
     # Sort by water usage
     material_analysis = material_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(material_analysis))
+    # Use pastel colors for materials
+    material_colors = PASTEL_COLORS[5:5+len(material_analysis)]
     
     # Create plot
     plt.figure(figsize=(10, 6))
     
-    # Plot horizontal bar chart with purple shades
+    # Plot horizontal bar chart with pastel colors
     bars = plt.barh(material_analysis['Material_Type'], material_analysis['Water_Usage_Millions'], 
-                   color=purple_palette)
+                   color=material_colors)
     
     plt.title('Water Usage by Material Type', fontsize=16)
     plt.xlabel('Average Water Usage (Million Liters)')
@@ -305,15 +313,15 @@ def analyze_country_carbon(df):
     # Sort by carbon footprint for better visualization
     country_analysis = country_analysis.sort_values('Carbon_Footprint_MT', ascending=False)
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(country_analysis))
+    # Use pastel colors for countries
+    country_colors = PASTEL_COLORS[10:10+len(country_analysis)]
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with purple shades
+    # Create horizontal bar chart with pastel colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Carbon_Footprint_MT'],
-                   color=purple_palette)
+                   color=country_colors)
     
     plt.title('Average Carbon Footprint by Country', fontsize=16)
     plt.xlabel('Carbon Footprint (MT)')
@@ -343,15 +351,18 @@ def analyze_country_water(df):
     # Sort by water usage for better visualization
     country_analysis = country_analysis.sort_values('Water_Usage_Millions', ascending=True)
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(country_analysis))
+    # Use pastel colors for countries
+    country_colors = PASTEL_COLORS[15:15+len(country_analysis)]
+    if len(country_colors) < len(country_analysis):
+        # If we need more colors than available, reuse from beginning
+        country_colors.extend(PASTEL_COLORS[:len(country_analysis)-len(country_colors)])
     
     # Create the plot
     plt.figure(figsize=(10, 6))
     
-    # Create horizontal bar chart with purple shades
+    # Create horizontal bar chart with pastel colors
     bars = plt.barh(country_analysis['Country'], country_analysis['Water_Usage_Millions'],
-                   color=purple_palette)
+                   color=country_colors)
     
     plt.title('Average Water Usage by Country', fontsize=16)
     plt.xlabel('Water Usage (Million Liters)')
@@ -379,18 +390,18 @@ def analyze_price_vs_carbon(df):
     # Create the scatter plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create a color map for sustainability ratings
+    # Create a pastel color map for sustainability ratings
     rating_to_color = {
-        'A': '#E6C2F7',  # Light Purple
-        'B': '#C77DFF',  # Medium Purple
-        'C': '#9D4EDD',  # Darker Purple
-        'D': '#5A189A'   # Darkest Purple
+        'A': '#B6D7A8',  # Soft green
+        'B': '#A4C2F4',  # Soft blue
+        'C': '#D5A6BD',  # Soft pink
+        'D': '#FFD966'   # Soft yellow
     }
     
     # Map each point to its color based on rating
     colors = sample_df['Sustainability_Rating'].map(rating_to_color)
     
-    # Create scatter plot
+    # Create scatter plot with pastel colors
     plt.scatter(
         sample_df['Average_Price_USD'],
         sample_df['Carbon_Footprint_MT'],
@@ -405,7 +416,7 @@ def analyze_price_vs_carbon(df):
     
     # Calculate and plot trendline
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-    plt.plot(x, intercept + slope*x, '--', color='#9932CC', linewidth=2)  # Dark Orchid for trend line
+    plt.plot(x, intercept + slope*x, '--', color='#B4A7D6', linewidth=2)  # Soft purple for trend line
     
     # Add labels and title
     plt.xlabel('Average Price (USD)', fontsize=12)
@@ -440,15 +451,15 @@ def analyze_price_category_carbon(df):
         'Carbon_Footprint_MT': 'mean',
     }).reset_index()
     
-    # Create a purple palette
-    purple_palette = generate_purple_palette(len(category_data))
+    # Use pastel colors for price categories
+    price_colors = ['#CFE2F3', '#D9EAD3', '#FFF2CC']  # Pale blue, pale green, pale yellow
     
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with purple palette
+    # Create bar chart with pastel colors
     bars = plt.bar(category_data['Price_Category'], category_data['Carbon_Footprint_MT'],
-                  color=purple_palette)
+                  color=price_colors)
     
     # Add labels and title
     plt.xlabel('Price Category', fontsize=12)
@@ -473,12 +484,12 @@ def analyze_eco_friendly_carbon(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with blue and purple colors
-    custom_palette = ['#9370DB', '#4B0082']  # Medium Purple, Indigo
+    # Use pastel colors for eco-friendly claims
+    eco_colors = ['#D9EAD3', '#F4CCCC']  # Soft green, soft pink/red
     
-    # Create bar chart
+    # Create bar chart with pastel colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Carbon_Footprint_MT'],
-                  color=custom_palette)
+                  color=eco_colors)
     
     plt.title('Carbon Footprint by Eco-Friendly Manufacturing Claims', fontsize=16)
     plt.xlabel('Eco-Friendly Claim')
@@ -504,12 +515,12 @@ def analyze_eco_friendly_water(df):
     # Create the plot
     plt.figure(figsize=(9, 5.5))
     
-    # Create bar chart with blue and purple colors
-    custom_palette = ['#9370DB', '#4B0082']  # Medium Purple, Indigo
+    # Use pastel colors for eco-friendly claims
+    eco_colors = ['#D9EAD3', '#F4CCCC']  # Soft green, soft pink/red
     
-    # Create bar chart
+    # Create bar chart with pastel colors
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Water_Usage_Millions'],
-                  color=custom_palette)
+                  color=eco_colors)
     
     plt.title('Water Usage by Eco-Friendly Manufacturing Claims', fontsize=16)
     plt.xlabel('Eco-Friendly Claim')
@@ -523,7 +534,7 @@ def analyze_eco_friendly_water(df):
     return eco_analysis
 
 def main():
-    """Run all environmental impact analyses with purple color schemes."""
+    """Run all environmental impact analyses with pastel color schemes."""
     # Load the data
     df = load_data()
     
@@ -547,7 +558,7 @@ def main():
     eco_carbon = analyze_eco_friendly_carbon(df)
     eco_water = analyze_eco_friendly_water(df)
     
-    print("All visualizations have been created with purple color schemes.")
+    print("All visualizations have been created with soft pastel colors.")
     print("Generated visualizations saved as PNG files in the current directory.")
 
 if __name__ == "__main__":
