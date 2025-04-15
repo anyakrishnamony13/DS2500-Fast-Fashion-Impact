@@ -444,8 +444,8 @@ def analyze_eco_friendly_carbon(df):
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Carbon_Footprint_MT'],
                   color=eco_colors)
     
-    plt.title('Carbon Footprint by Manufacturing Claim', fontsize=16)
-    plt.xlabel('Manufacturing Claim')
+    plt.title('Carbon Footprint by Eco-Friendly Manufacturing Claim', fontsize=16)
+    plt.xlabel('Eco-Friendly Manufacturing Claim')
     plt.ylabel('Average Carbon Footprint (MT)')
     plt.grid(True, alpha=0.3)
     
@@ -476,8 +476,8 @@ def analyze_eco_friendly_water(df):
     bars = plt.bar(eco_analysis['Eco_Friendly_Manufacturing'], eco_analysis['Water_Usage_Millions'],
                   color=eco_colors)
     
-    plt.title('Water Usage by Manufacturing Claims', fontsize=16)
-    plt.xlabel('Manufacturing Claim')
+    plt.title('Water Usage by Eco-Friendly Manufacturing Claims', fontsize=16)
+    plt.xlabel('Eco-Friendly Manufacturing Claim')
     plt.ylabel('Average Water Usage (Million Liters)')
     plt.grid(True, alpha=0.3)
     
